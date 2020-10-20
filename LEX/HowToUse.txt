@@ -1,0 +1,3 @@
+flex lex_source.l
+gcc lex.yy.c -ll
+./a.out < test1.cpp

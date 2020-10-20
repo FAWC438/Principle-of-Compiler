@@ -20,6 +20,7 @@
         "numeric": "cpp",
         "streambuf": "cpp",
         "cmath": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "test1.C": "cpp"
     }
 }
