@@ -22,6 +22,7 @@
         "cmath": "cpp",
         "utility": "cpp",
         "test1.C": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "iomanip": "cpp"
     }
 }

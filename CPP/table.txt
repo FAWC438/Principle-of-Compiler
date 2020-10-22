@@ -24,3 +24,6 @@
 24	P
 25	printf
 26	Delete
+27	main
+28	a
+29	b

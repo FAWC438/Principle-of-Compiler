@@ -1,368 +1,410 @@
-< punct,# >
-< key,include >
-< rel-op,< >
-< ID,1 >
-< punct,. >
-< ID,2 >
-< rel-op,> >
-< punct,# >
-< key,include >
-< rel-op,< >
-< ID,3 >
-< punct,. >
-< ID,2 >
-< rel-op,> >
-< punct,# >
-< key,include >
-< rel-op,< >
-< ID,4 >
-< punct,. >
-< ID,2 >
-< rel-op,> >
-< punct,# >
-< key,include >
-< rel-op,< >
-< ID,5 >
-< punct,. >
-< ID,2 >
-< rel-op,> >
-< punct,# >
-< key,define >
-< ID,6 >
-< key,int >
-< punct,# >
-< key,define >
-< ID,7 >
-< num,0 >
-< punct,# >
-< key,define >
-< ID,8 >
-< num,1 >
-< punct,# >
-< key,define >
-< ID,9 >
-< num,20 >
-< punct,# >
-< key,define >
-< ID,10 >
-< key,int >
-< comments,- >
-< key,typedef >
-< key,int >
-< ID,11 >
-< punct,; >
-< key,typedef >
-< key,struct >
-< ID,12 >
-< arith-op,* >
-< ID,13 >
-< punct,; >
-< key,struct >
-< ID,12 >
-< punct,{ >
-< ID,10 >
-< ID,14 >
-< punct,[ >
-< ID,9 >
-< punct,] >
-< punct,; >
-< ID,11 >
-< ID,15 >
-< punct,; >
-< punct,} >
-< punct,; >
-< comments,- >
-< ID,13 >
-< ID,16 >
-< punct,( >
-< punct,) >
-< punct,{ >
-< ID,13 >
-< ID,17 >
-< punct,; >
-< ID,17 >
-< asgn-op,= >
-< punct,( >
-< ID,13 >
-< punct,) >
-< ID,18 >
-< punct,( >
-< key,sizeof >
-< punct,( >
-< key,struct >
-< ID,12 >
-< punct,) >
-< punct,) >
-< punct,; >
-< ID,17 >
-< ptr-op,-> >
-< ID,15 >
-< asgn-op,= >
-< arith-op,- > 
-< num,1 >
-< punct,; >
-< key,return >
-< ID,17 >
-< punct,; >
-< punct,} >
-< comments,- >
-< punct,# >
-< key,define >
-< ID,19 >
-< arith-op,- > 
-< num,1 >
-< ID,11 >
-< ID,20 >
-< punct,( >
-< ID,13 >
-< ID,17 >
-< punct,, >
-< ID,10 >
-< ID,21 >
-< punct,) >
-< punct,{ >
-< ID,11 >
-< ID,22 >
-< asgn-op,= >
-< num,0 >
-< punct,; >
-< key,while >
-< punct,( >
-< ID,22 >
-< rel-op,<= >
-< ID,17 >
-< ptr-op,-> >
-< ID,15 >
-< log-op,&& >
-< ID,17 >
-< ptr-op,-> >
-< ID,14 >
-< punct,[ >
-< ID,22 >
-< punct,] >
-< rel-op,!= >
-< ID,21 >
-< punct,) >
-< ID,22 >
-< arith-op,++ >
-< punct,; >
-< key,if >
-< punct,( >
-< ID,22 >
-< rel-op,> >
-< ID,17 >
-< ptr-op,-> >
-< ID,15 >
-< punct,) >
-< key,return >
-< ID,19 >
-< punct,; >
-< comments,- >
-< key,else >
-< key,return >
-< ID,22 >
-< punct,; >
-< comments,- >
-< punct,} >
-< comments,- >
-< comments,- >
-< ID,6 >
-< ID,23 >
-< punct,( >
-< ID,13 >
-< ID,17 >
-< punct,, >
-< ID,10 >
-< ID,21 >
-< punct,, >
-< ID,11 >
-< ID,24 >
-< punct,) >
-< punct,{ >
-< comments,- >
-< ID,11 >
-< ID,22 >
-< punct,; >
-< key,if >
-< punct,( >
-< ID,17 >
-< ptr-op,-> >
-< ID,15 >
-< rel-op,== >
-< ID,9 >
-< arith-op,- > 
-< num,1 >
-< punct,) >
-< punct,{ >
-< comments,- >
-< ID,25 >
-< punct,( >
-< string,- >
-< punct,) >
-< punct,; >
-< key,return >
-< ID,7 >
-< punct,; >
-< punct,} >
-< key,if >
-< punct,( >
-< ID,24 >
-< rel-op,< >
-< num,0 >
-< log-op,|| >
-< ID,24 >
-< rel-op,> >
-< ID,17 >
-< ptr-op,-> >
-< ID,15 >
-< arith-op,+ >
-< num,1 >
-< punct,) >
-< punct,{ >
-< comments,- >
-< ID,25 >
-< punct,( >
-< string,- >
-< punct,) >
-< punct,; >
-< key,return >
-< ID,7 >
-< punct,; >
-< punct,} >
-< key,for >
-< punct,( >
-< ID,22 >
-< asgn-op,= >
-< ID,17 >
-< ptr-op,-> >
-< ID,15 >
-< punct,; >
-< ID,22 >
-< rel-op,>= >
-< ID,24 >
-< punct,; >
-< ID,22 >
-< arith-op,-- >
-< punct,) >
-< ID,17 >
-< ptr-op,-> >
-< ID,14 >
-< punct,[ >
-< ID,22 >
-< arith-op,+ >
-< num,1 >
-< punct,] >
-< asgn-op,= >
-< ID,17 >
-< ptr-op,-> >
-< ID,14 >
-< punct,[ >
-< ID,22 >
-< punct,] >
-< punct,; >
-< comments,- >
-< ID,17 >
-< ptr-op,-> >
-< ID,14 >
-< punct,[ >
-< ID,24 >
-< punct,] >
-< asgn-op,= >
-< ID,21 >
-< punct,; >
-< comments,- >
-< ID,17 >
-< ptr-op,-> >
-< ID,15 >
-< arith-op,++ >
-< punct,; >
-< comments,- >
-< key,return >
-< ID,8 >
-< punct,; >
-< punct,} >
-< comments,- >
-< comments,- >
-< ID,6 >
-< ID,26 >
-< punct,( >
-< ID,13 >
-< ID,17 >
-< punct,, >
-< ID,11 >
-< ID,24 >
-< punct,) >
-< punct,{ >
-< comments,- >
-< ID,11 >
-< ID,22 >
-< punct,; >
-< key,if >
-< punct,( >
-< ID,24 >
-< rel-op,< >
-< num,0 >
-< log-op,|| >
-< ID,24 >
-< rel-op,> >
-< ID,17 >
-< ptr-op,-> >
-< ID,15 >
-< punct,) >
-< punct,{ >
-< comments,- >
-< ID,25 >
-< punct,( >
-< string,- >
-< punct,, >
-< ID,24 >
-< punct,) >
-< punct,; >
-< key,return >
-< ID,7 >
-< punct,; >
-< punct,} >
-< key,for >
-< punct,( >
-< ID,22 >
-< asgn-op,= >
-< ID,24 >
-< arith-op,+ >
-< num,1 >
-< punct,; >
-< ID,22 >
-< rel-op,<= >
-< ID,17 >
-< ptr-op,-> >
-< ID,15 >
-< punct,; >
-< ID,22 >
-< arith-op,++ >
-< punct,) >
-< ID,17 >
-< ptr-op,-> >
-< ID,14 >
-< punct,[ >
-< ID,22 >
-< arith-op,- > 
-< num,1 >
-< punct,] >
-< asgn-op,= >
-< ID,17 >
-< ptr-op,-> >
-< ID,14 >
-< punct,[ >
-< ID,22 >
-< punct,] >
-< punct,; >
-< comments,- >
-< ID,17 >
-< ptr-op,-> >
-< ID,15 >
-< arith-op,-- >
-< punct,; >
-< comments,- >
-< key,return >
-< ID,8 >
-< punct,; >
-< punct,} >
+            Specification
+
+[ID-<number>]: 用户定义或额外导入的库函数的记号
+[keyword]: C语言保留字
+[num]: 全体实数，支持指数表示
+[comments]: 注释
+[punct]: 标点符号
+[char]: 字符
+[string]: 字符串
+[arith-op]: 算数运算符
+[asgn-op]: 复合运算符
+[ptr-op]: 指针运算符
+[bit-op]: 位运算符
+[logic-op]: 逻辑运算符
+[relop-op]: 关系运算符
+
+请注意：以下的Column对于多个字符的记号来说，指向的是其最后一个字符所在的列数
+
+  Line:Column    Type      Token        
+-----------------------------------------
+<    1:2         punct     #            >
+<    1:9         keyword   include      >
+<    1:11        relop-op  <            >
+<    1:15        ID-1      math         >
+<    1:16        punct     .            >
+<    1:17        ID-2      h            >
+<    1:18        relop-op  >            >
+<    2:2         punct     #            >
+<    2:9         keyword   include      >
+<    2:11        relop-op  <            >
+<    2:16        ID-3      stdio        >
+<    2:17        punct     .            >
+<    2:18        ID-2      h            >
+<    2:19        relop-op  >            >
+<    3:2         punct     #            >
+<    3:9         keyword   include      >
+<    3:11        relop-op  <            >
+<    3:17        ID-4      stdlib       >
+<    3:18        punct     .            >
+<    3:19        ID-2      h            >
+<    3:20        relop-op  >            >
+<    4:2         punct     #            >
+<    4:9         keyword   include      >
+<    4:11        relop-op  <            >
+<    4:17        ID-5      string       >
+<    4:18        punct     .            >
+<    4:19        ID-2      h            >
+<    4:20        relop-op  >            >
+<    6:2         punct     #            >
+<    6:8         keyword   define       >
+<    6:13        ID-6      bool         >
+<    6:17        keyword   int          >
+<    7:2         punct     #            >
+<    7:8         keyword   define       >
+<    7:14        ID-7      false        >
+<    7:16        num       0            >
+<    8:2         punct     #            >
+<    8:8         keyword   define       >
+<    8:13        ID-8      true         >
+<    8:15        num       1            >
+<    9:2         punct     #            >
+<    9:8         keyword   define       >
+<    9:16        ID-9      MAXSIZE      >
+<    9:19        num       20           >
+<   10:2         punct     #            >
+<   10:8         keyword   define       >
+<   10:20        ID-10     ElementType  >
+<   10:24        keyword   int          >
+<   14:3         comments  -            >
+<   16:8         keyword   typedef      >
+<   16:12        keyword   int          >
+<   16:21        ID-11     Position     >
+<   16:22        punct     ;            >
+<   17:8         keyword   typedef      >
+<   17:15        keyword   struct       >
+<   17:21        ID-12     LNode        >
+<   17:23        arith-op  *            >
+<   17:27        ID-13     List         >
+<   17:28        punct     ;            >
+<   18:7         keyword   struct       >
+<   18:13        ID-12     LNode        >
+<   19:2         punct     {            >
+<   20:16        ID-10     ElementType  >
+<   20:21        ID-14     Data         >
+<   20:22        punct     [            >
+<   20:29        ID-9      MAXSIZE      >
+<   20:30        punct     ]            >
+<   20:31        punct     ;            >
+<   21:13        ID-11     Position     >
+<   21:18        ID-15     Last         >
+<   21:19        punct     ;            >
+<   22:2         punct     }            >
+<   22:3         punct     ;            >
+<   24:16        comments  -            >
+<   25:5         ID-13     List         >
+<   25:15        ID-16     MakeEmpty    >
+<   25:16        punct     (            >
+<   25:17        punct     )            >
+<   26:2         punct     {            >
+<   27:9         ID-13     List         >
+<   27:11        ID-17     L            >
+<   27:12        punct     ;            >
+<   29:6         ID-17     L            >
+<   29:8         asgn-op   =            >
+<   29:10        punct     (            >
+<   29:14        ID-13     List         >
+<   29:15        punct     )            >
+<   29:21        ID-18     malloc       >
+<   29:22        punct     (            >
+<   29:28        keyword   sizeof       >
+<   29:29        punct     (            >
+<   29:35        keyword   struct       >
+<   29:41        ID-12     LNode        >
+<   29:42        punct     )            >
+<   29:43        punct     )            >
+<   29:44        punct     ;            >
+<   30:6         ID-17     L            >
+<   30:8         ptr-op    ->           >
+<   30:12        ID-15     Last         >
+<   30:14        asgn-op   =            >
+<   30:16        arith-op  -            >
+<   30:17        num       1            >
+<   30:18        punct     ;            >
+<   32:11        keyword   return       >
+<   32:13        ID-17     L            >
+<   32:14        punct     ;            >
+<   33:2         punct     }            >
+<   35:13        comments  -            >
+<   36:2         punct     #            >
+<   36:8         keyword   define       >
+<   36:14        ID-19     ERROR        >
+<   36:16        arith-op  -            >
+<   36:17        num       1            >
+<   38:9         ID-11     Position     >
+<   38:14        ID-20     Find         >
+<   38:15        punct     (            >
+<   38:19        ID-13     List         >
+<   38:21        ID-17     L            >
+<   38:22        punct     ,            >
+<   38:34        ID-10     ElementType  >
+<   38:36        ID-21     X            >
+<   38:37        punct     )            >
+<   39:2         punct     {            >
+<   40:13        ID-11     Position     >
+<   40:15        ID-22     i            >
+<   40:17        asgn-op   =            >
+<   40:19        num       0            >
+<   40:20        punct     ;            >
+<   42:10        keyword   while        >
+<   42:12        punct     (            >
+<   42:13        ID-22     i            >
+<   42:16        relop-op  <=           >
+<   42:18        ID-17     L            >
+<   42:20        ptr-op    ->           >
+<   42:24        ID-15     Last         >
+<   42:27        logic-op  &&           >
+<   42:29        ID-17     L            >
+<   42:31        ptr-op    ->           >
+<   42:35        ID-14     Data         >
+<   42:36        punct     [            >
+<   42:37        ID-22     i            >
+<   42:38        punct     ]            >
+<   42:41        relop-op  !=           >
+<   42:43        ID-21     X            >
+<   42:44        punct     )            >
+<   43:10        ID-22     i            >
+<   43:12        arith-op  ++           >
+<   43:13        punct     ;            >
+<   44:7         keyword   if           >
+<   44:9         punct     (            >
+<   44:10        ID-22     i            >
+<   44:12        relop-op  >            >
+<   44:14        ID-17     L            >
+<   44:16        ptr-op    ->           >
+<   44:20        ID-15     Last         >
+<   44:21        punct     )            >
+<   45:15        keyword   return       >
+<   45:21        ID-19     ERROR        >
+<   45:22        punct     ;            >
+<   45:65        comments  -            >
+<   46:9         keyword   else         >
+<   47:15        keyword   return       >
+<   47:17        ID-22     i            >
+<   47:18        punct     ;            >
+<   47:58        comments  -            >
+<   48:2         punct     }            >
+<   50:13        comments  -            >
+<   51:174       comments  -            >
+<   52:5         ID-6      bool         >
+<   52:12        ID-23     Insert       >
+<   52:13        punct     (            >
+<   52:17        ID-13     List         >
+<   52:19        ID-17     L            >
+<   52:20        punct     ,            >
+<   52:32        ID-10     ElementType  >
+<   52:34        ID-21     X            >
+<   52:35        punct     ,            >
+<   52:44        ID-11     Position     >
+<   52:46        ID-24     P            >
+<   52:47        punct     )            >
+<   53:2         punct     {            >
+<   53:54        comments  -            >
+<   54:13        ID-11     Position     >
+<   54:15        ID-22     i            >
+<   54:16        punct     ;            >
+<   56:7         keyword   if           >
+<   56:9         punct     (            >
+<   56:10        ID-17     L            >
+<   56:12        ptr-op    ->           >
+<   56:16        ID-15     Last         >
+<   56:19        relop-op  ==           >
+<   56:27        ID-9      MAXSIZE      >
+<   56:29        arith-op  -            >
+<   56:31        num       1            >
+<   56:32        punct     )            >
+<   57:6         punct     {            >
+<   58:45        comments  -            >
+<   59:15        ID-25     printf       >
+<   59:16        punct     (            >
+<   59:24        string    -            >
+<   59:25        punct     )            >
+<   59:26        punct     ;            >
+<   60:15        keyword   return       >
+<   60:21        ID-7      false        >
+<   60:22        punct     ;            >
+<   61:6         punct     }            >
+<   62:7         keyword   if           >
+<   62:9         punct     (            >
+<   62:10        ID-24     P            >
+<   62:12        relop-op  <            >
+<   62:14        num       0            >
+<   62:17        logic-op  ||           >
+<   62:19        ID-24     P            >
+<   62:21        relop-op  >            >
+<   62:23        ID-17     L            >
+<   62:25        ptr-op    ->           >
+<   62:29        ID-15     Last         >
+<   62:31        arith-op  +            >
+<   62:33        num       1            >
+<   62:34        punct     )            >
+<   63:6         punct     {            >
+<   63:43        comments  -            >
+<   64:15        ID-25     printf       >
+<   64:16        punct     (            >
+<   64:33        string    -            >
+<   64:34        punct     )            >
+<   64:35        punct     ;            >
+<   65:15        keyword   return       >
+<   65:21        ID-7      false        >
+<   65:22        punct     ;            >
+<   66:6         punct     }            >
+<   67:8         keyword   for          >
+<   67:10        punct     (            >
+<   67:11        ID-22     i            >
+<   67:13        asgn-op   =            >
+<   67:15        ID-17     L            >
+<   67:17        ptr-op    ->           >
+<   67:21        ID-15     Last         >
+<   67:22        punct     ;            >
+<   67:24        ID-22     i            >
+<   67:27        relop-op  >=           >
+<   67:29        ID-24     P            >
+<   67:30        punct     ;            >
+<   67:32        ID-22     i            >
+<   67:34        arith-op  --           >
+<   67:35        punct     )            >
+<   68:10        ID-17     L            >
+<   68:12        ptr-op    ->           >
+<   68:16        ID-14     Data         >
+<   68:17        punct     [            >
+<   68:18        ID-22     i            >
+<   68:20        arith-op  +            >
+<   68:22        num       1            >
+<   68:23        punct     ]            >
+<   68:25        asgn-op   =            >
+<   68:27        ID-17     L            >
+<   68:29        ptr-op    ->           >
+<   68:33        ID-14     Data         >
+<   68:34        punct     [            >
+<   68:35        ID-22     i            >
+<   68:36        punct     ]            >
+<   68:37        punct     ;            >
+<   68:90        comments  -            >
+<   69:6         ID-17     L            >
+<   69:8         ptr-op    ->           >
+<   69:12        ID-14     Data         >
+<   69:13        punct     [            >
+<   69:14        ID-24     P            >
+<   69:15        punct     ]            >
+<   69:17        asgn-op   =            >
+<   69:19        ID-21     X            >
+<   69:20        punct     ;            >
+<   69:59        comments  -            >
+<   70:6         ID-17     L            >
+<   70:8         ptr-op    ->           >
+<   70:12        ID-15     Last         >
+<   70:14        arith-op  ++           >
+<   70:15        punct     ;            >
+<   70:69        comments  -            >
+<   71:11        keyword   return       >
+<   71:16        ID-8      true         >
+<   71:17        punct     ;            >
+<   72:2         punct     }            >
+<   74:13        comments  -            >
+<   75:174       comments  -            >
+<   76:5         ID-6      bool         >
+<   76:12        ID-26     Delete       >
+<   76:13        punct     (            >
+<   76:17        ID-13     List         >
+<   76:19        ID-17     L            >
+<   76:20        punct     ,            >
+<   76:29        ID-11     Position     >
+<   76:31        ID-24     P            >
+<   76:32        punct     )            >
+<   77:2         punct     {            >
+<   77:44        comments  -            >
+<   78:13        ID-11     Position     >
+<   78:15        ID-22     i            >
+<   78:16        punct     ;            >
+<   80:7         keyword   if           >
+<   80:9         punct     (            >
+<   80:10        ID-24     P            >
+<   80:12        relop-op  <            >
+<   80:14        num       0            >
+<   80:17        logic-op  ||           >
+<   80:19        ID-24     P            >
+<   80:21        relop-op  >            >
+<   80:23        ID-17     L            >
+<   80:25        ptr-op    ->           >
+<   80:29        ID-15     Last         >
+<   80:30        punct     )            >
+<   81:6         punct     {            >
+<   81:52        comments  -            >
+<   82:15        ID-25     printf       >
+<   82:16        punct     (            >
+<   82:41        string    -            >
+<   82:42        punct     ,            >
+<   82:44        ID-24     P            >
+<   82:45        punct     )            >
+<   82:46        punct     ;            >
+<   83:15        keyword   return       >
+<   83:21        ID-7      false        >
+<   83:22        punct     ;            >
+<   84:6         punct     }            >
+<   85:8         keyword   for          >
+<   85:10        punct     (            >
+<   85:11        ID-22     i            >
+<   85:13        asgn-op   =            >
+<   85:15        ID-24     P            >
+<   85:17        arith-op  +            >
+<   85:19        num       1            >
+<   85:20        punct     ;            >
+<   85:22        ID-22     i            >
+<   85:25        relop-op  <=           >
+<   85:27        ID-17     L            >
+<   85:29        ptr-op    ->           >
+<   85:33        ID-15     Last         >
+<   85:34        punct     ;            >
+<   85:36        ID-22     i            >
+<   85:38        arith-op  ++           >
+<   85:39        punct     )            >
+<   86:10        ID-17     L            >
+<   86:12        ptr-op    ->           >
+<   86:16        ID-14     Data         >
+<   86:17        punct     [            >
+<   86:18        ID-22     i            >
+<   86:20        arith-op  -            >
+<   86:22        num       1            >
+<   86:23        punct     ]            >
+<   86:25        asgn-op   =            >
+<   86:27        ID-17     L            >
+<   86:29        ptr-op    ->           >
+<   86:33        ID-14     Data         >
+<   86:34        punct     [            >
+<   86:35        ID-22     i            >
+<   86:36        punct     ]            >
+<   86:37        punct     ;            >
+<   86:92        comments  -            >
+<   87:6         ID-17     L            >
+<   87:8         ptr-op    ->           >
+<   87:12        ID-15     Last         >
+<   87:14        arith-op  --           >
+<   87:15        punct     ;            >
+<   87:69        comments  -            >
+<   88:11        keyword   return       >
+<   88:16        ID-8      true         >
+<   88:17        punct     ;            >
+<   89:2         punct     }            >
+<   91:4         keyword   int          >
+<   91:9         ID-27     main         >
+<   91:10        punct     (            >
+<   91:11        punct     )            >
+<   92:2         punct     {            >
+<   93:9         keyword   char         >
+<   93:11        ID-28     a            >
+<   93:13        asgn-op   =            >
+< Error(93,18): Invalid char value >
+<   93:19        punct     ,            >
+<   93:21        ID-29     b            >
+<   93:23        asgn-op   =            >
+<   93:28        char      '\n'         >
+<   93:29        punct     ;            >
+<   94:11        ID-25     printf       >
+<   94:12        punct     (            >
+<   94:18        string    -            >
+<   94:19        punct     ,            >
+<   94:24        char      '\n'         >
+<   94:25        punct     )            >
+<   94:26        punct     ;            >
+<   95:2         punct     }            >

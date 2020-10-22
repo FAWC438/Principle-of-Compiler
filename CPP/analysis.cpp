@@ -12,7 +12,7 @@ using namespace std;
 int line = 0, column = 0, cnt_word = 0, cnt_char = 0;
 
 string in_file_str, out_file_str, buffer, token;
-string::iterator ptr_forward = buffer.end();
+string::iterator ptr_forward = buffer.end(); // 向前指针
 ifstream in_file_stream;
 ofstream out_file_stream, table_file_stream;
 
@@ -210,6 +210,60 @@ bool test_comments()
     }
 }
 
+/**
+ * @brief 封装输出样式
+ * 
+ * @param type_str 输出的记号类型
+ */
+void output_line(string type_str)
+{
+    if (type_str == "comments" || type_str == "string")
+    {
+        out_file_stream << "<"
+                        << right << setw(5) << line << ":"
+                        << left << setw(10) << column
+                        << left << setw(10) << type_str
+                        << left << setw(13) << "-"
+                        << ">" << endl;
+    }
+    else
+    {
+        out_file_stream << "<"
+                        << right << setw(5) << line << ":"
+                        << left << setw(10) << column
+                        << left << setw(10) << type_str
+                        << left << setw(13) << token << ">" << endl;
+    }
+}
+
+void show_head_word()
+{
+    out_file_stream << right << setw(25) << "Specification" << endl
+                    << endl;
+    out_file_stream << "[ID-<number>]: 用户定义或额外导入的库函数中的记号" << endl;
+    out_file_stream << "[keyword]: C语言保留字" << endl;
+    out_file_stream << "[num]: 全体实数，支持指数表示" << endl;
+    out_file_stream << "[comments]: 注释" << endl;
+    out_file_stream << "[punct]: 标点符号" << endl;
+    out_file_stream << "[char]: 字符" << endl;
+    out_file_stream << "[string]: 字符串" << endl;
+    out_file_stream << "[arith-op]: 算数运算符" << endl;
+    out_file_stream << "[asgn-op]: 复合运算符" << endl;
+    out_file_stream << "[ptr-op]: 指针运算符" << endl;
+    out_file_stream << "[bit-op]: 位运算符" << endl;
+    out_file_stream << "[logic-op]: 逻辑运算符" << endl;
+    out_file_stream << "[relop-op]: 关系运算符" << endl
+                    << endl;
+    out_file_stream << "请注意：以下的Column对于多个字符的记号来说，指向的是其最后一个字符所在的列数" << endl
+                    << endl;
+    out_file_stream << right << setw(6) << "Line"
+                    << ":"
+                    << left << setw(10) << "Column"
+                    << left << setw(10) << "Type"
+                    << left << setw(13) << "Token" << endl;
+    out_file_stream << "-----------------------------------------" << endl;
+}
+
 int main()
 {
     set<string> keywords(words, words + 34);
@@ -242,13 +296,15 @@ int main()
         return -1;
     }
 
-    table_file_stream.open("符号表.txt");
+    table_file_stream.open("table.txt");
 
     if (!table_file_stream)
     {
         cout << "无法创建符号表！" << endl;
         return -1;
     }
+
+    show_head_word();
 
     while (true)
     {
@@ -308,9 +364,9 @@ int main()
                 }
 
                 if (keywords.count(token) == 0)
-                    out_file_stream << "< ID," << table_insert() << " >" << endl;
+                    output_line("ID-" + to_string(table_insert()));
                 else
-                    out_file_stream << "< key," << token << " >" << endl;
+                    output_line("keyword");
 
                 cnt_word++; // 单词数加一
             }
@@ -319,8 +375,8 @@ int main()
                 token.append(1, C);
                 ptr_forward++;
                 column++;
-                test_digits(1);                                       // 读取无符号实数剩余部分
-                out_file_stream << "< num," << token << " >" << endl; // DTB(token)
+                test_digits(1); // 读取无符号实数剩余部分
+                output_line("num");
                 cnt_word++;
             }
             else
@@ -333,23 +389,23 @@ int main()
                     column++;
 
                     if (ptr_forward == buffer.end())
-                        out_file_stream << "< arith-op," << token << " >" << endl;
+                        output_line("arith-op");
                     else
                     {
                         if (*ptr_forward == '+')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< arith-op," << token << " >" << endl;
+                            output_line("arith-op");
                         }
                         else if (*ptr_forward == '=')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< asgn-op," << token << " >" << endl;
+                            output_line("asgn-op");
                         }
                         else
-                            out_file_stream << "< arith-op," << token << " >" << endl;
+                            output_line("arith-op");
                     }
 
                     cnt_word++;
@@ -361,29 +417,29 @@ int main()
                     column++;
 
                     if (ptr_forward == buffer.end())
-                        out_file_stream << "< arith-op," << token << " >" << endl;
+                        output_line("arith-op");
                     else
                     {
                         if (*ptr_forward == '-')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< arith-op," << token << " >" << endl;
+                            output_line("arith-op");
                         }
                         else if (*ptr_forward == '=')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< asgn-op," << token << " >" << endl;
+                            output_line("asgn-op");
                         }
                         else if (*ptr_forward == '>')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< ptr-op," << token << " >" << endl;
+                            output_line("ptr-op");
                         }
                         else
-                            out_file_stream << "< arith-op," << token << " > " << endl;
+                            output_line("arith-op");
                     }
 
                     cnt_word++;
@@ -395,17 +451,17 @@ int main()
                     column++;
 
                     if (ptr_forward == buffer.end())
-                        out_file_stream << "< arith-op," << token << " >" << endl;
+                        output_line("arith-op");
                     else
                     {
                         if (*ptr_forward == '=')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< asgn-op," << token << " >" << endl;
+                            output_line("asgn-op");
                         }
                         else
-                            out_file_stream << "< arith-op," << token << " >" << endl;
+                            output_line("arith-op");
                     }
 
                     cnt_word++;
@@ -418,7 +474,7 @@ int main()
 
                     if (ptr_forward == buffer.end())
                     {
-                        out_file_stream << "< arith-op," << token << " >" << endl; // 行末除号
+                        output_line("arith-op");
                         cnt_word++;
                     }
                     else
@@ -428,7 +484,7 @@ int main()
                             // 除法复合赋值
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< asgn-op," << token << " >" << endl;
+                            output_line("asgn-op");
                             cnt_word++;
                         }
                         else if (*ptr_forward == '/')
@@ -442,9 +498,7 @@ int main()
                                 token.append(1, *ptr_forward++);
                                 column++;
                             }
-
-                            out_file_stream << "< comments,"
-                                            << "- >" << endl;
+                            output_line("comments");
                         }
                         else if (*ptr_forward == '*')
                         {
@@ -454,8 +508,7 @@ int main()
                             int ret = test_comments();
 
                             if (ret)
-                                out_file_stream << "< comments,"
-                                                << "- >" << endl;
+                                output_line("comments");
                             else
                             {
                                 int i = 1;
@@ -475,7 +528,7 @@ int main()
                         else
                         {
                             // 除号后是其他字符，为单个除号
-                            out_file_stream << "< arith-op," << token << " >" << endl;
+                            output_line("arith-op");
                             cnt_word++;
                         }
                     }
@@ -488,17 +541,17 @@ int main()
                     column++;
 
                     if (ptr_forward == buffer.end())
-                        out_file_stream << "< arith-op," << token << " >" << endl;
+                        output_line("arith-op");
                     else
                     {
                         if (*ptr_forward == '=')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< asgn-op," << token << " >" << endl;
+                            output_line("asgn-op");
                         }
                         else
-                            out_file_stream << "< arith-op," << token << " >" << endl;
+                            output_line("arith-op");
                     }
 
                     cnt_word++;
@@ -510,23 +563,23 @@ int main()
                     column++;
 
                     if (ptr_forward == buffer.end())
-                        out_file_stream << "< bit-op," << token << " >" << endl;
+                        output_line("bit-op");
                     else
                     {
                         if (*ptr_forward == '=')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< asgn-op," << token << " >" << endl;
+                            output_line("asgn-op");
                         }
                         else if (*ptr_forward == '&')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< log-op," << token << " >" << endl;
+                            output_line("logic-op");
                         }
                         else
-                            out_file_stream << "< bit-op," << token << " >" << endl;
+                            output_line("bit-op");
                     }
 
                     cnt_word++;
@@ -538,23 +591,23 @@ int main()
                     column++;
 
                     if (ptr_forward == buffer.end())
-                        out_file_stream << "< bit-op," << token << " >" << endl;
+                        output_line("bit-op");
                     else
                     {
                         if (*ptr_forward == '=')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< asgn-op," << token << " >" << endl;
+                            output_line("asgn-op");
                         }
                         else if (*ptr_forward == '|')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< log-op," << token << " >" << endl;
+                            output_line("logic-op");
                         }
                         else
-                            out_file_stream << "< bit-op," << token << " >" << endl;
+                            output_line("bit-op");
                     }
 
                     cnt_word++;
@@ -566,17 +619,17 @@ int main()
                     column++;
 
                     if (ptr_forward == buffer.end())
-                        out_file_stream << "< bit-op," << token << " >" << endl;
+                        output_line("bit-op");
                     else
                     {
                         if (*ptr_forward == '=')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< asgn-op," << token << " >" << endl;
+                            output_line("asgn-op");
                         }
                         else
-                            out_file_stream << "< bit-op," << token << " >" << endl;
+                            output_line("bit-op");
                     }
 
                     cnt_word++;
@@ -586,7 +639,7 @@ int main()
                     token.append(1, C);
                     ptr_forward++;
                     column++;
-                    out_file_stream << "< bit-op," << token << " >" << endl;
+                    output_line("bit-op");
                     cnt_word++;
                     break;
 
@@ -596,17 +649,17 @@ int main()
                     column++;
 
                     if (ptr_forward == buffer.end())
-                        out_file_stream << "< rel-op," << token << " >" << endl;
+                        output_line("relop-op");
                     else
                     {
                         if (*ptr_forward == '=')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< rel-op," << token << " >" << endl;
+                            output_line("relop-op");
                         }
                         else
-                            out_file_stream << "< rel-op," << token << " >" << endl;
+                            output_line("relop-op");
                     }
 
                     cnt_word++;
@@ -618,17 +671,17 @@ int main()
                     column++;
 
                     if (ptr_forward == buffer.end())
-                        out_file_stream << "< asgn-op," << token << " >" << endl;
+                        output_line("asgn-op");
                     else
                     {
                         if (*ptr_forward == '=')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< rel-op," << token << " >" << endl;
+                            output_line("relop-op");
                         }
                         else
-                            out_file_stream << "< asgn-op," << token << " >" << endl;
+                            output_line("asgn-op");
                     }
 
                     ++cnt_word;
@@ -640,17 +693,17 @@ int main()
                     column++;
 
                     if (ptr_forward == buffer.end())
-                        out_file_stream << "< rel-op," << token << " >" << endl;
+                        output_line("relop-op");
                     else
                     {
                         if (*ptr_forward == '=')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< rel-op," << token << " >" << endl;
+                            output_line("relop-op");
                         }
                         else
-                            out_file_stream << "< rel-op," << token << " >" << endl;
+                            output_line("relop-op");
                     }
 
                     cnt_word++;
@@ -662,17 +715,17 @@ int main()
                     column++;
 
                     if (ptr_forward == buffer.end())
-                        out_file_stream << "< punct," << token << " >" << endl;
+                        output_line("punct");
                     else
                     {
                         if (*ptr_forward == '=')
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< rel-op," << token << " >" << endl;
+                            output_line("relop-op");
                         }
                         else
-                            out_file_stream << "< punct," << token << " >" << endl;
+                            output_line("punct");
                     }
 
                     cnt_word++;
@@ -693,11 +746,12 @@ int main()
 
                         if (ptr_forward == buffer.end())
                         {
-                            out_file_stream << "< Error(" << line << "," << column << "): missing terminating \" character >" << endl; //error();
+                            out_file_stream << "< Error(" << line << "," << column << "): Missing terminating \" character >" << endl; //error();
                             break;
                         }
                         else if (*(ptr_forward - 1) == '\\')
                         {
+                            // 跳过转义符\"
                             token.append(1, *ptr_forward++);
                             column++;
                             continue;
@@ -706,8 +760,7 @@ int main()
                         {
                             token.append(1, *ptr_forward++);
                             column++;
-                            out_file_stream << "< string,"
-                                            << "- >" << endl;
+                            output_line("string");
                             break;
                         }
                     }
@@ -722,39 +775,27 @@ int main()
 
                     while ((ptr_forward != buffer.end()) && (*ptr_forward != '\''))
                     {
-                        // TODO: char 仅能检测单个字符
                         token.append(1, *ptr_forward++);
                         column++;
                     }
 
                     if (ptr_forward == buffer.end())
+                        out_file_stream << "< Error(" << line << "," << column << "): Missing terminating \' character >" << endl;
+                    else if ((*(ptr_forward - 2) == '\\' && token.size() == 3) || (*(ptr_forward - 2) != '\\' && token.size() == 2))
                     {
-                        out_file_stream << "< Error(" << line << "," << column << "): missing terminating \' character >" << endl; //error();
-                        break;
-                    }
-                    else if (*(ptr_forward - 1) == '\\')
-                    {
+                        // char类型只能是一个字符，或是两个字符的转义符
                         token.append(1, *ptr_forward++);
                         column++;
-
-                        if (ptr_forward != buffer.end())
-                        {
-                            token.append(1, *ptr_forward++);
-                            column++;
-                        }
-                        else
-                            out_file_stream << "< Error(" << line << "," << column << "): missing terminating \' character >" << endl; //error();
-                        break;
+                        output_line("char");
+                        cnt_word++;
                     }
                     else
                     {
-                        token.append(1, *ptr_forward++);
+                        ptr_forward++;
                         column++;
+                        out_file_stream << "< Error(" << line << "," << column << "): Invalid char value >" << endl;
                     }
 
-                    out_file_stream << "< char,"
-                                    << "- >" << endl;
-                    cnt_word++;
                     break;
 
                 case '.':
@@ -768,12 +809,12 @@ int main()
                         token.append(1, *ptr_forward++);
                         column++;
                         test_digits(2);
-                        out_file_stream << "< num," << token << " >" << endl; // DTB(token)
+                        output_line("num");
                         cnt_word++;
                         break;
                     }
 
-                    out_file_stream << "< punct," << token << " >" << endl;
+                    output_line("punct");
                     cnt_word++;
                     break;
 
@@ -792,7 +833,7 @@ int main()
                     token.append(1, C);
                     ptr_forward++;
                     column++;
-                    out_file_stream << "< punct," << token << " >" << endl;
+                    output_line("punct");
                     cnt_word++;
                     break;
 
