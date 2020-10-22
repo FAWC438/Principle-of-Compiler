@@ -236,6 +236,10 @@ void output_line(string type_str)
     }
 }
 
+/**
+ * @brief 在输出中展示说明文本
+ * 
+ */
 void show_head_word()
 {
     out_file_stream << right << setw(25) << "Specification" << endl
@@ -264,15 +268,39 @@ void show_head_word()
     out_file_stream << "-----------------------------------------" << endl;
 }
 
+/**
+ * @brief 展示结果文本并关闭IO流
+ * 
+ */
+void show_result()
+{
+    int i = 1;
+
+    for (vector<string>::iterator it = table.begin(); it != table.end(); it++)
+        table_file_stream << left << i++ << "\t" << *it << endl;
+
+    cout << "总行数：" << line << endl;
+    cout << "单词数：" << cnt_word << endl;
+    cout << "字符数：" << cnt_char << endl;
+    out_file_stream << endl
+                    << "Total lines: " << line << endl;
+    out_file_stream << "Total words: " << cnt_word << endl;
+    out_file_stream << "Total characters: " << cnt_char << endl;
+
+    table_file_stream.close();
+    in_file_stream.close();
+    out_file_stream.close();
+}
+
 int main()
 {
     set<string> keywords(words, words + 34);
     char C;
-    cout << "源文件（回车默认使用in.c）：" << endl;
+    cout << "请输入源文件名称（回车则默认使用in.c）：" << endl;
     getline(cin, in_file_str);
 
     if (in_file_str == "")
-        in_file_str = "in.c"; // 回车默认
+        in_file_str = "in.c";
 
     in_file_stream.open(in_file_str.c_str());
 
@@ -282,11 +310,11 @@ int main()
         return -1;
     }
 
-    cout << "目标文件（回车默认使用out.txt）：" << endl;
+    cout << "请输入目标文件名称（回车则默认使用out.txt）：" << endl;
     getline(cin, out_file_str);
 
     if (out_file_str == "")
-        out_file_str = "out.txt"; // 回车默认
+        out_file_str = "out.txt";
 
     out_file_stream.open(out_file_str.c_str());
 
@@ -321,18 +349,7 @@ int main()
             }
             else // 读到错误或EOF则返回false
             {
-                int i = 1;
-
-                in_file_stream.close();
-                out_file_stream.close();
-
-                for (vector<string>::iterator it = table.begin(); it != table.end(); it++)
-                    table_file_stream << left << i++ << "\t" << *it << endl;
-
-                table_file_stream.close();
-                cout << "总行数：" << line << endl;
-                cout << "单词数：" << cnt_word << endl;
-                cout << "字符数：" << cnt_char << endl;
+                show_result();
                 return 0;
             }
         }
@@ -511,17 +528,7 @@ int main()
                                 output_line("comments");
                             else
                             {
-                                int i = 1;
-                                in_file_stream.close();
-                                out_file_stream.close();
-
-                                for (vector<string>::iterator it = table.begin(); it != table.end(); it++)
-                                    table_file_stream << left << i++ << "\t" << *it << endl;
-
-                                table_file_stream.close();
-                                cout << "总行数：" << line << endl;
-                                cout << "单词数：" << cnt_word << endl;
-                                cout << "字符数：" << cnt_char << endl;
+                                show_result();
                                 return 0;
                             }
                         }

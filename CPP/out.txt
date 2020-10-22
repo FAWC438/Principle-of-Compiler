@@ -1,6 +1,6 @@
             Specification
 
-[ID-<number>]: 用户定义或额外导入的库函数的记号
+[ID-<number>]: 用户定义或额外导入的库函数中的记号
 [keyword]: C语言保留字
 [num]: 全体实数，支持指数表示
 [comments]: 注释
@@ -408,3 +408,7 @@
 <   94:25        punct     )            >
 <   94:26        punct     ;            >
 <   95:2         punct     }            >
+
+Total lines: 95
+Total words: 370
+Total characters: 2304
