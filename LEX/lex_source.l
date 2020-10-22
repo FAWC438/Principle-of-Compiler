@@ -23,8 +23,9 @@ NOTCHAR      [^\']
 KEYWORD		 include|define|char|short|int|unsigned|long|float|double|struct|union|void|enum|signed|const|volatile|typedef|auto|register|static|extern|break|case|continue|default|do|else|for|goto|if|return|switch|while|sizeof
 PUNC		 \,|\;
 DOT			 \.
-RELOP        \=|\=\=|\<|\>|\<\=|\>\=
-OPERATOR     \+|\-|\*|\\|\&|\||\^|\?|\%
+RELOP        \=\=|\<|\>|\<\=|\>\=
+EQUAL		 \=
+OPERATOR     \+|\-|\*|\\|\&|\||\^|\?|\%|\+\+|\-\-|\+\=|\-\=|\*\=|\/\=
 BRACKET      \(|\)|\{|\}|\[|\]
 ID        	 ({letter}|\_)({letter}|{digit}|\_)*
 NUM       	 {digit}+(\.{digit}+)?(E(\+|\-)?digit+)?
@@ -110,6 +111,12 @@ error3       @|~|`
 	fprintf(fp,"RELOP: %s\n",yytext);
 	columnCount+=yyleng;
 	charCount+=yyleng;
+	}
+{EQUAL}		   {
+	printf("EQUAL: %s\n",yytext);
+	fprintf(fp,"EQUAL: %s\n",yytext);
+	columnCount++;
+	charCount++;
 	}
 {BRACKET}      {
 	printf("BRACKET: %s\n",yytext);
