@@ -596,7 +596,7 @@ int wordCount = 0;
 int charCount = 0;
 int columnCount = 0;
 int lineCount = 1;
-int IDCount = 1;
+int IDCount = 0;
 int stringCount = 0;
 FILE *fp;
 
@@ -1056,7 +1056,7 @@ BEGIN(IN_COMMENT);yymore();
 case 18:
 YY_RULE_SETUP
 #line 142 "lex_source.l"
-printf("ANNODATE: %s\n",yytext);BEGIN(INITIAL);
+printf("ANNODATE: %s\n",yytext);fprintf(fp,"ANNODATE: %s\n",yytext);BEGIN(INITIAL);
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
@@ -1079,25 +1079,38 @@ case 22:
 /* rule 22 can match eol */
 YY_RULE_SETUP
 #line 148 "lex_source.l"
-{printf("ERROR:Line %d, Column %d: Cannot Match the Left Puncuation.\n",lineCount,columnCount+1);fprintf(fp,"ERROR:Line %d, Column %d: Cannot Match the Left Puncuation.\n",lineCount,columnCount+1);columnCount+=yyleng;charCount+=yyleng;}
+{
+	printf("ERROR:Line %d, Column %d: Cannot Match the Left Puncuation.\n",lineCount,columnCount+1);
+	fprintf(fp,"ERROR:Line %d, Column %d: Cannot Match the Left Puncuation.\n",lineCount,columnCount+1);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	}
 	YY_BREAK
 case 23:
 /* rule 23 can match eol */
 YY_RULE_SETUP
-#line 149 "lex_source.l"
-{lineCount++;columnCount=0;}
+#line 154 "lex_source.l"
+{
+	lineCount++;
+	columnCount=0;
+	}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 150 "lex_source.l"
-{printf("UNKNOW: %s\n",yytext);fprintf(fp,"UNKNOW: %s\n",yytext);charCount++;columnCount++;}
+#line 158 "lex_source.l"
+{
+	printf("UNKNOW: %s\n",yytext);
+	fprintf(fp,"UNKNOW: %s\n",yytext);
+	charCount++;
+	columnCount++;
+	}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 152 "lex_source.l"
+#line 165 "lex_source.l"
 ECHO;
 	YY_BREAK
-#line 1101 "lex.yy.c"
+#line 1114 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(IN_COMMENT):
 	yyterminate();
@@ -2103,7 +2116,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 152 "lex_source.l"
+#line 165 "lex_source.l"
 
 
 int main()

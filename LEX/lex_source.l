@@ -139,15 +139,28 @@ error3       @|~|`
 "/*"           BEGIN(IN_COMMENT);yymore();
 }
 <IN_COMMENT>{
-"*/"           printf("ANNODATE: %s\n",yytext);BEGIN(INITIAL);
+"*/"           printf("ANNODATE: %s\n",yytext);fprintf(fp,"ANNODATE: %s\n",yytext);BEGIN(INITIAL);
 [^*\n]+	       yymore();
 "*"            yymore();
 \n             lineCount++;yymore();
 }
 
-{error2}       {printf("ERROR:Line %d, Column %d: Cannot Match the Left Puncuation.\n",lineCount,columnCount+1);fprintf(fp,"ERROR:Line %d, Column %d: Cannot Match the Left Puncuation.\n",lineCount,columnCount+1);columnCount+=yyleng;charCount+=yyleng;}
-{WARP}         {lineCount++;columnCount=0;}
-.              {printf("UNKNOW: %s\n",yytext);fprintf(fp,"UNKNOW: %s\n",yytext);charCount++;columnCount++;}
+{error2}       {
+	printf("ERROR:Line %d, Column %d: Cannot Match the Left Puncuation.\n",lineCount,columnCount+1);
+	fprintf(fp,"ERROR:Line %d, Column %d: Cannot Match the Left Puncuation.\n",lineCount,columnCount+1);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	}
+{WARP}         {
+	lineCount++;
+	columnCount=0;
+	}
+.              {
+	printf("UNKNOW: %s\n",yytext);
+	fprintf(fp,"UNKNOW: %s\n",yytext);
+	charCount++;
+	columnCount++;
+	}
 
 %%
 
