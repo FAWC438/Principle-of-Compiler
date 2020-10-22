@@ -4,7 +4,9 @@
 #include <fstream>
 #include <iostream>
 #include <stack>
+
 using namespace std;
+
 const int num_of_keyword = 22;
 const int num_of_MO = 11;
 const int num_of_BO = 12;
