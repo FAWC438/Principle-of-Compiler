@@ -1,374 +1,434 @@
-MACRO: #
-KEYWORD: include
-INCLUDE: <math.h>
-MACRO: #
-KEYWORD: include
-INCLUDE: <stdio.h>
-MACRO: #
-KEYWORD: include
-INCLUDE: <stdlib.h>
-MACRO: #
-KEYWORD: include
-INCLUDE: <string.h>
-MACRO: #
-KEYWORD: define
-ID0: bool
-KEYWORD: int
-MACRO: #
-KEYWORD: define
-ID1: false
-NUM: 0
-MACRO: #
-KEYWORD: define
-ID2: true
-NUM: 1
-MACRO: #
-KEYWORD: define
-ID3: MAXSIZE
-NUM: 20
-MACRO: #
-KEYWORD: define
-ID4: ElementType
-KEYWORD: int
-ANNODATE: /*
+MACRO(1, 0): #
+KEYWORD(1, 1): include
+INCLUDE(1, 9): <math.h>
+MACRO(2, 0): #
+KEYWORD(2, 1): include
+INCLUDE(2, 9): <stdio.h>
+MACRO(3, 0): #
+KEYWORD(3, 1): include
+INCLUDE(3, 9): <stdlib.h>
+MACRO(4, 0): #
+KEYWORD(4, 1): include
+INCLUDE(4, 9): <string.h>
+MACRO(6, 0): #
+KEYWORD(6, 1): define
+ID0(6, 8): bool
+KEYWORD(6, 13): int
+MACRO(7, 0): #
+KEYWORD(7, 1): define
+ID1(7, 8): false
+NUM(7, 14): 0
+MACRO(8, 0): #
+KEYWORD(8, 1): define
+ID2(8, 8): true
+NUM(8, 13): 1
+MACRO(9, 0): #
+KEYWORD(9, 1): define
+ID3(9, 8): MAXSIZE
+NUM(9, 16): 20
+MACRO(10, 0): #
+KEYWORD(10, 1): define
+ID4(10, 8): ElementType
+KEYWORD(10, 20): int
+ANNODATE(14, 0): /*
     数组线性表
 */
-KEYWORD: typedef
-KEYWORD: int
-ID5: Position
-PUNCTUATION: ;
-KEYWORD: typedef
-KEYWORD: struct
-ID6: LNode
-OPERATOR: *
-ID7: List
-PUNCTUATION: ;
-KEYWORD: struct
-ID8: LNode
-BRACKET: {
-ID9: ElementType
-ID10: Data
-BRACKET: [
-ID11: MAXSIZE
-BRACKET: ]
-PUNCTUATION: ;
-ID12: Position
-ID13: Last
-PUNCTUATION: ;
-BRACKET: }
-PUNCTUATION: ;
-ANNODATE: /* 初始化 */
-ID14: List
-ID15: MakeEmpty
-BRACKET: (
-BRACKET: )
-BRACKET: {
-ID16: List
-ID17: L
-PUNCTUATION: ;
-ID18: L
-EQUAL: =
-BRACKET: (
-ID19: List
-BRACKET: )
-ID20: malloc
-BRACKET: (
-KEYWORD: sizeof
-BRACKET: (
-KEYWORD: struct
-ID21: LNode
-BRACKET: )
-BRACKET: )
-PUNCTUATION: ;
-ID22: L
-OPERATOR: -
-RELOP: >
-ID23: Last
-EQUAL: =
-OPERATOR: -
-NUM: 1
-PUNCTUATION: ;
-KEYWORD: return
-ID24: L
-PUNCTUATION: ;
-BRACKET: }
-ANNODATE: /* 查找 */
-MACRO: #
-KEYWORD: define
-ID25: ERROR
-OPERATOR: -
-NUM: 1
-ID26: Position
-ID27: Find
-BRACKET: (
-ID28: List
-ID29: L
-PUNCTUATION: ,
-ID30: ElementType
-ID31: X
-BRACKET: )
-BRACKET: {
-ID32: Position
-ID33: i
-EQUAL: =
-NUM: 0
-PUNCTUATION: ;
-KEYWORD: while
-BRACKET: (
-ID34: i
-RELOP: <=
-ID35: L
-OPERATOR: -
-RELOP: >
-ID36: Last
-OPERATOR: &
-OPERATOR: &
-ID37: L
-OPERATOR: -
-RELOP: >
-ID38: Data
-BRACKET: [
-ID39: i
-BRACKET: ]
-UNKNOW: !
-EQUAL: =
-ID40: X
-BRACKET: )
-ID41: i
-OPERATOR: ++
-PUNCTUATION: ;
-KEYWORD: if
-BRACKET: (
-ID42: i
-RELOP: >
-ID43: L
-OPERATOR: -
-RELOP: >
-ID44: Last
-BRACKET: )
-KEYWORD: return
-ID45: ERROR
-PUNCTUATION: ;
-ANNODATE: /* 如果没找到，返回错误信息 */
-KEYWORD: else
-KEYWORD: return
-ID46: i
-PUNCTUATION: ;
-ANNODATE: /* 找到后返回的是存储位置 */
-BRACKET: }
-ANNODATE: /* 插入 */
-ANNODATE: /*注意:在插入位置参数P上与课程视频有所不同，课程视频中i是序列位序（从1开始），这里P是存储下标位置（从0开始），两者差1*/
-ID47: bool
-ID48: Insert
-BRACKET: (
-ID49: List
-ID50: L
-PUNCTUATION: ,
-ID51: ElementType
-ID52: X
-PUNCTUATION: ,
-ID53: Position
-ID54: P
-BRACKET: )
-BRACKET: {
-ANNODATE: /* 在L的指定位置P前插入一个新元素X */
-ID55: Position
-ID56: i
-PUNCTUATION: ;
-KEYWORD: if
-BRACKET: (
-ID57: L
-OPERATOR: -
-RELOP: >
-ID58: Last
-RELOP: ==
-ID59: MAXSIZE
-OPERATOR: -
-NUM: 1
-BRACKET: )
-BRACKET: {
-ANNODATE: /* 表空间已满，不能插入 */
-ID60: printf
-BRACKET: (
-STRING0: "表满"
-BRACKET: )
-PUNCTUATION: ;
-KEYWORD: return
-ID61: false
-PUNCTUATION: ;
-BRACKET: }
-KEYWORD: if
-BRACKET: (
-ID62: P
-RELOP: <
-NUM: 0
-OPERATOR: |
-OPERATOR: |
-ID63: P
-RELOP: >
-ID64: L
-OPERATOR: -
-RELOP: >
-ID65: Last
-OPERATOR: +
-NUM: 1
-BRACKET: )
-BRACKET: {
-ANNODATE: /* 检查插入位置的合法性 */
-ID66: printf
-BRACKET: (
-STRING1: "位置不合法"
-BRACKET: )
-PUNCTUATION: ;
-KEYWORD: return
-ID67: false
-PUNCTUATION: ;
-BRACKET: }
-KEYWORD: for
-BRACKET: (
-ID68: i
-EQUAL: =
-ID69: L
-OPERATOR: -
-RELOP: >
-ID70: Last
-PUNCTUATION: ;
-ID71: i
-RELOP: >=
-ID72: P
-PUNCTUATION: ;
-ID73: i
-OPERATOR: --
-BRACKET: )
-ID74: L
-OPERATOR: -
-RELOP: >
-ID75: Data
-BRACKET: [
-ID76: i
-OPERATOR: +
-NUM: 1
-BRACKET: ]
-EQUAL: =
-ID77: L
-OPERATOR: -
-RELOP: >
-ID78: Data
-BRACKET: [
-ID79: i
-BRACKET: ]
-PUNCTUATION: ;
-ANNODATE: /* 将位置P及以后的元素顺序向后移动 */
-ID80: L
-OPERATOR: -
-RELOP: >
-ID81: Data
-BRACKET: [
-ID82: P
-BRACKET: ]
-EQUAL: =
-ID83: X
-PUNCTUATION: ;
-ANNODATE: /* 新元素插入 */
-ID84: L
-OPERATOR: -
-RELOP: >
-ID85: Last
-OPERATOR: ++
-PUNCTUATION: ;
-ANNODATE: /* Last仍指向最后元素 */
-KEYWORD: return
-ID86: true
-PUNCTUATION: ;
-BRACKET: }
-ANNODATE: /* 删除 */
-ANNODATE: /*注意:在删除位置参数P上与课程视频有所不同，课程视频中i是序列位序（从1开始），这里P是存储下标位置（从0开始），两者差1*/
-ID87: bool
-ID88: Delete
-BRACKET: (
-ID89: List
-ID90: L
-PUNCTUATION: ,
-ID91: Position
-ID92: P
-BRACKET: )
-BRACKET: {
-ANNODATE: /* 从L中删除指定位置P的元素 */
-ID93: Position
-ID94: i
-PUNCTUATION: ;
-KEYWORD: if
-BRACKET: (
-ID95: P
-RELOP: <
-NUM: 0
-OPERATOR: |
-OPERATOR: |
-ID96: P
-RELOP: >
-ID97: L
-OPERATOR: -
-RELOP: >
-ID98: Last
-BRACKET: )
-BRACKET: {
-ANNODATE: /* 检查空表及删除位置的合法性 */
-ID99: printf
-BRACKET: (
-STRING2: "位置%d不存在元素"
-PUNCTUATION: ,
-ID100: P
-BRACKET: )
-PUNCTUATION: ;
-KEYWORD: return
-ID101: false
-PUNCTUATION: ;
-BRACKET: }
-KEYWORD: for
-BRACKET: (
-ID102: i
-EQUAL: =
-ID103: P
-OPERATOR: +
-NUM: 1
-PUNCTUATION: ;
-ID104: i
-RELOP: <=
-ID105: L
-OPERATOR: -
-RELOP: >
-ID106: Last
-PUNCTUATION: ;
-ID107: i
-OPERATOR: ++
-BRACKET: )
-ID108: L
-OPERATOR: -
-RELOP: >
-ID109: Data
-BRACKET: [
-ID110: i
-OPERATOR: -
-NUM: 1
-BRACKET: ]
-EQUAL: =
-ID111: L
-OPERATOR: -
-RELOP: >
-ID112: Data
-BRACKET: [
-ID113: i
-BRACKET: ]
-PUNCTUATION: ;
-ANNODATE: /* 将位置P+1及以后的元素顺序向前移动 */
-ID114: L
-OPERATOR: -
-RELOP: >
-ID115: Last
-OPERATOR: --
-PUNCTUATION: ;
-ANNODATE: /* Last仍指向最后元素 */
-KEYWORD: return
-ID116: true
-PUNCTUATION: ;
-BRACKET: }
+KEYWORD(16, 0): typedef
+KEYWORD(16, 8): int
+ID5(16, 12): Position
+PUNCTUATION(16, 20): ;
+KEYWORD(17, 0): typedef
+KEYWORD(17, 8): struct
+ID6(17, 15): LNode
+OPERATOR(17, 21): *
+ID7(17, 22): List
+PUNCTUATION(17, 26): ;
+KEYWORD(18, 0): struct
+ID8(18, 7): LNode
+BRACKET(19, 0): {
+ID9(20, 4): ElementType
+ID10(20, 16): Data
+BRACKET(20, 20): [
+ID11(20, 21): MAXSIZE
+BRACKET(20, 28): ]
+PUNCTUATION(20, 29): ;
+ID12(21, 4): Position
+ID13(21, 13): Last
+PUNCTUATION(21, 17): ;
+BRACKET(22, 0): }
+PUNCTUATION(22, 1): ;
+ANNODATE(24, 0): /* 初始化 */
+ID14(25, 0): List
+ID15(25, 5): MakeEmpty
+BRACKET(25, 14): (
+BRACKET(25, 15): )
+BRACKET(26, 0): {
+ID16(27, 4): List
+ID17(27, 9): L
+PUNCTUATION(27, 10): ;
+ID18(29, 4): L
+EQUAL(29, 6): =
+BRACKET(29, 8): (
+ID19(29, 9): List
+BRACKET(29, 13): )
+ID20(29, 14): malloc
+BRACKET(29, 20): (
+KEYWORD(29, 21): sizeof
+BRACKET(29, 27): (
+KEYWORD(29, 28): struct
+ID21(29, 35): LNode
+BRACKET(29, 40): )
+BRACKET(29, 41): )
+PUNCTUATION(29, 42): ;
+ID22(30, 4): L
+OPERATOR(30, 5): -
+RELOP(30, 6): >
+ID23(30, 7): Last
+EQUAL(30, 12): =
+OPERATOR(30, 14): -
+NUM(30, 15): 1
+PUNCTUATION(30, 16): ;
+KEYWORD(32, 4): return
+ID24(32, 11): L
+PUNCTUATION(32, 12): ;
+BRACKET(33, 0): }
+ANNODATE(35, 0): /* 查找 */
+MACRO(36, 0): #
+KEYWORD(36, 1): define
+ID25(36, 8): ERROR
+OPERATOR(36, 14): -
+NUM(36, 15): 1
+ID26(38, 0): Position
+ID27(38, 9): Find
+BRACKET(38, 13): (
+ID28(38, 14): List
+ID29(38, 19): L
+PUNCTUATION(38, 20): ,
+ID30(38, 22): ElementType
+ID31(38, 34): X
+BRACKET(38, 35): )
+BRACKET(39, 0): {
+ID32(40, 4): Position
+ID33(40, 13): i
+EQUAL(40, 15): =
+NUM(40, 17): 0
+PUNCTUATION(40, 18): ;
+KEYWORD(42, 4): while
+BRACKET(42, 10): (
+ID34(42, 11): i
+RELOP(42, 13): <=
+ID35(42, 16): L
+OPERATOR(42, 17): -
+RELOP(42, 18): >
+ID36(42, 19): Last
+OPERATOR(42, 24): &
+OPERATOR(42, 25): &
+ID37(42, 27): L
+OPERATOR(42, 28): -
+RELOP(42, 29): >
+ID38(42, 30): Data
+BRACKET(42, 34): [
+ID39(42, 35): i
+BRACKET(42, 36): ]
+UNKNOW(42, 38): !
+EQUAL(42, 39): =
+ID40(42, 41): X
+BRACKET(42, 42): )
+ID41(43, 8): i
+OPERATOR(43, 9): ++
+PUNCTUATION(43, 10): ;
+KEYWORD(44, 4): if
+BRACKET(44, 7): (
+ID42(44, 8): i
+RELOP(44, 10): >
+ID43(44, 12): L
+OPERATOR(44, 13): -
+RELOP(44, 14): >
+ID44(44, 15): Last
+BRACKET(44, 19): )
+KEYWORD(45, 8): return
+ID45(45, 15): ERROR
+PUNCTUATION(45, 20): ;
+ANNODATE(45, 22): /* 如果没找到，返回错误信息 */
+KEYWORD(46, 4): else
+KEYWORD(47, 8): return
+ID46(47, 15): i
+PUNCTUATION(47, 16): ;
+ANNODATE(47, 18): /* 找到后返回的是存储位置 */
+BRACKET(48, 0): }
+ANNODATE(50, 0): /* 插入 */
+ANNODATE(51, 0): /*注意:在插入位置参数P上与课程视频有所不同，课程视频中i是序列位序（从1开始），这里P是存储下标位置（从0开始），两者差1*/
+ID47(52, 0): bool
+ID48(52, 5): Insert
+BRACKET(52, 11): (
+ID49(52, 12): List
+ID50(52, 17): L
+PUNCTUATION(52, 18): ,
+ID51(52, 20): ElementType
+ID52(52, 32): X
+PUNCTUATION(52, 33): ,
+ID53(52, 35): Position
+ID54(52, 44): P
+BRACKET(52, 45): )
+BRACKET(53, 0): {
+ANNODATE(53, 2): /* 在L的指定位置P前插入一个新元素X */
+ID55(54, 4): Position
+ID56(54, 13): i
+PUNCTUATION(54, 14): ;
+KEYWORD(56, 4): if
+BRACKET(56, 7): (
+ID57(56, 8): L
+OPERATOR(56, 9): -
+RELOP(56, 10): >
+ID58(56, 11): Last
+RELOP(56, 16): ==
+ID59(56, 19): MAXSIZE
+OPERATOR(56, 27): -
+NUM(56, 29): 1
+BRACKET(56, 30): )
+BRACKET(57, 4): {
+ANNODATE(58, 8): /* 表空间已满，不能插入 */
+ID60(59, 8): printf
+BRACKET(59, 14): (
+STRING0(59, 15): "表满"
+BRACKET(59, 23): )
+PUNCTUATION(59, 24): ;
+KEYWORD(60, 8): return
+ID61(60, 15): false
+PUNCTUATION(60, 20): ;
+BRACKET(61, 4): }
+KEYWORD(62, 4): if
+BRACKET(62, 7): (
+ID62(62, 8): P
+RELOP(62, 10): <
+NUM(62, 12): 0
+OPERATOR(62, 14): |
+OPERATOR(62, 15): |
+ID63(62, 17): P
+RELOP(62, 19): >
+ID64(62, 21): L
+OPERATOR(62, 22): -
+RELOP(62, 23): >
+ID65(62, 24): Last
+OPERATOR(62, 29): +
+NUM(62, 31): 1
+BRACKET(62, 32): )
+BRACKET(63, 4): {
+ANNODATE(63, 6): /* 检查插入位置的合法性 */
+ID66(64, 8): printf
+BRACKET(64, 14): (
+STRING1(64, 15): "位置不合法"
+BRACKET(64, 32): )
+PUNCTUATION(64, 33): ;
+KEYWORD(65, 8): return
+ID67(65, 15): false
+PUNCTUATION(65, 20): ;
+BRACKET(66, 4): }
+KEYWORD(67, 4): for
+BRACKET(67, 8): (
+ID68(67, 9): i
+EQUAL(67, 11): =
+ID69(67, 13): L
+OPERATOR(67, 14): -
+RELOP(67, 15): >
+ID70(67, 16): Last
+PUNCTUATION(67, 20): ;
+ID71(67, 22): i
+RELOP(67, 24): >=
+ID72(67, 27): P
+PUNCTUATION(67, 28): ;
+ID73(67, 30): i
+OPERATOR(67, 31): --
+BRACKET(67, 32): )
+ID74(68, 8): L
+OPERATOR(68, 9): -
+RELOP(68, 10): >
+ID75(68, 11): Data
+BRACKET(68, 15): [
+ID76(68, 16): i
+OPERATOR(68, 18): +
+NUM(68, 20): 1
+BRACKET(68, 21): ]
+EQUAL(68, 23): =
+ID77(68, 25): L
+OPERATOR(68, 26): -
+RELOP(68, 27): >
+ID78(68, 28): Data
+BRACKET(68, 32): [
+ID79(68, 33): i
+BRACKET(68, 34): ]
+PUNCTUATION(68, 35): ;
+ANNODATE(68, 37): /* 将位置P及以后的元素顺序向后移动 */
+ID80(69, 4): L
+OPERATOR(69, 5): -
+RELOP(69, 6): >
+ID81(69, 7): Data
+BRACKET(69, 11): [
+ID82(69, 12): P
+BRACKET(69, 13): ]
+EQUAL(69, 15): =
+ID83(69, 17): X
+PUNCTUATION(69, 18): ;
+ANNODATE(69, 37): /* 新元素插入 */
+ID84(70, 4): L
+OPERATOR(70, 5): -
+RELOP(70, 6): >
+ID85(70, 7): Last
+OPERATOR(70, 11): ++
+PUNCTUATION(70, 12): ;
+ANNODATE(70, 36): /* Last仍指向最后元素 */
+KEYWORD(71, 4): return
+ID86(71, 11): true
+PUNCTUATION(71, 15): ;
+BRACKET(72, 0): }
+ANNODATE(74, 0): /* 删除 */
+ANNODATE(75, 0): /*注意:在删除位置参数P上与课程视频有所不同，课程视频中i是序列位序（从1开始），这里P是存储下标位置（从0开始），两者差1*/
+ID87(76, 0): bool
+ID88(76, 5): Delete
+BRACKET(76, 11): (
+ID89(76, 12): List
+ID90(76, 17): L
+PUNCTUATION(76, 18): ,
+ID91(76, 20): Position
+ID92(76, 29): P
+BRACKET(76, 30): )
+BRACKET(77, 0): {
+ANNODATE(77, 2): /* 从L中删除指定位置P的元素 */
+ID93(78, 4): Position
+ID94(78, 13): i
+PUNCTUATION(78, 14): ;
+KEYWORD(80, 4): if
+BRACKET(80, 7): (
+ID95(80, 8): P
+RELOP(80, 10): <
+NUM(80, 12): 0
+OPERATOR(80, 14): |
+OPERATOR(80, 15): |
+ID96(80, 17): P
+RELOP(80, 19): >
+ID97(80, 21): L
+OPERATOR(80, 22): -
+RELOP(80, 23): >
+ID98(80, 24): Last
+BRACKET(80, 28): )
+BRACKET(81, 4): {
+ANNODATE(81, 6): /* 检查空表及删除位置的合法性 */
+ID99(82, 8): printf
+BRACKET(82, 14): (
+STRING2(82, 15): "位置%d不存在元素"
+PUNCTUATION(82, 40): ,
+ID100(82, 42): P
+BRACKET(82, 43): )
+PUNCTUATION(82, 44): ;
+KEYWORD(83, 8): return
+ID101(83, 15): false
+PUNCTUATION(83, 20): ;
+BRACKET(84, 4): }
+KEYWORD(85, 4): for
+BRACKET(85, 8): (
+ID102(85, 9): i
+EQUAL(85, 11): =
+ID103(85, 13): P
+OPERATOR(85, 15): +
+NUM(85, 17): 1
+PUNCTUATION(85, 18): ;
+ID104(85, 20): i
+RELOP(85, 22): <=
+ID105(85, 25): L
+OPERATOR(85, 26): -
+RELOP(85, 27): >
+ID106(85, 28): Last
+PUNCTUATION(85, 32): ;
+ID107(85, 34): i
+OPERATOR(85, 35): ++
+BRACKET(85, 36): )
+ID108(86, 8): L
+OPERATOR(86, 9): -
+RELOP(86, 10): >
+ID109(86, 11): Data
+BRACKET(86, 15): [
+ID110(86, 16): i
+OPERATOR(86, 18): -
+NUM(86, 20): 1
+BRACKET(86, 21): ]
+EQUAL(86, 23): =
+ID111(86, 25): L
+OPERATOR(86, 26): -
+RELOP(86, 27): >
+ID112(86, 28): Data
+BRACKET(86, 32): [
+ID113(86, 33): i
+BRACKET(86, 34): ]
+PUNCTUATION(86, 35): ;
+ANNODATE(86, 37): /* 将位置P+1及以后的元素顺序向前移动 */
+ID114(87, 4): L
+OPERATOR(87, 5): -
+RELOP(87, 6): >
+ID115(87, 7): Last
+OPERATOR(87, 11): --
+PUNCTUATION(87, 12): ;
+ANNODATE(87, 36): /* Last仍指向最后元素 */
+KEYWORD(88, 4): return
+ID116(88, 11): true
+PUNCTUATION(88, 15): ;
+BRACKET(89, 0): }
+KEYWORD(91, 0): int
+ID117(91, 4): main
+BRACKET(91, 8): (
+BRACKET(91, 9): )
+BRACKET(92, 0): {
+KEYWORD(93, 4): char
+OPERATOR(93, 9): *
+ID118(93, 10): s
+EQUAL(93, 12): =
+STRING3(93, 14): "12av"
+PUNCTUATION(93, 20): ;
+KEYWORD(94, 4): char
+ID119(94, 9): a
+EQUAL(94, 11): =
+CHAR(94, 12):  'a'
+PUNCTUATION(94, 16): ,
+ID120(94, 17): a1
+EQUAL(94, 20): =
+ERROR: Line 94, Column 22: Invalid char pattern " 'r,"
+ID121(94, 26): b
+EQUAL(94, 28): =
+CHAR(94, 29):  'a'
+PUNCTUATION(94, 33): ,
+ID122(94, 35): b1
+EQUAL(94, 38): =
+CHAR(94, 39):  '\n'
+PUNCTUATION(94, 44): ;
+KEYWORD(95, 4): int
+ERROR: Line 95, Column 9: Identity cannot start with number "123abc"
+PUNCTUATION(95, 14): ;
+KEYWORD(96, 4): int
+ID123(96, 8): c
+EQUAL(96, 10): =
+ERROR: Line 96, Column 13: Identity cannot start with number "1e"
+OPERATOR(96, 14): +
+NUM(96, 15): 3
+PUNCTUATION(96, 16): ;
+KEYWORD(97, 4): int
+ID124(97, 8): d
+EQUAL(97, 10): =
+ERROR: Line 97, Column 13: Identity cannot start with number "2e"
+PUNCTUATION(97, 14): ,
+ID125(97, 16): e
+EQUAL(97, 18): =
+NUM(97, 20): 1.23
+DOT(97, 24): .
+NUM(97, 25): 1
+PUNCTUATION(97, 26): ;
+ID126(98, 4): printf
+BRACKET(98, 10): (
+STRING4(98, 11): "%c\n"
+PUNCTUATION(98, 17): ,
+CHAR(98, 18):  '\n'
+BRACKET(98, 23): )
+PUNCTUATION(98, 24): ;
+KEYWORD(99, 4): char
+OPERATOR(99, 9): *
+ID127(99, 10): str
+EQUAL(99, 14): =
+ERROR:Line 99, Column 17: String cannot match the left puncuation 

@@ -392,26 +392,60 @@
 <   91:11        punct     )            >
 <   92:2         punct     {            >
 <   93:9         keyword   char         >
-<   93:11        ID-28     a            >
-<   93:13        asgn-op   =            >
-< Error(93,18): Invalid char value >
-<   93:19        punct     ,            >
-<   93:21        ID-29     b            >
-<   93:23        asgn-op   =            >
-<   93:28        char      '\n'         >
-<   93:29        punct     ;            >
-<   94:8         keyword   int          >
-< Error(94,12): ID cannot start with digits >
-<   94:15        ID-30     abc          >
-<   94:16        punct     ;            >
-<   95:11        ID-25     printf       >
-<   95:12        punct     (            >
-<   95:18        string    -            >
-<   95:19        punct     ,            >
-<   95:24        char      '\n'         >
-<   95:25        punct     )            >
-<   95:26        punct     ;            >
-<   96:2         punct     }            >
+<   93:11        arith-op  *            >
+<   93:12        ID-28     s            >
+<   93:14        asgn-op   =            >
+<   93:21        string    -            >
+<   93:22        punct     ;            >
+<   94:9         keyword   char         >
+<   94:11        ID-29     a            >
+<   94:13        asgn-op   =            >
+<   94:17        char      'a'          >
+<   94:18        punct     ,            >
+<   94:20        ID-30     a1           >
+<   94:22        asgn-op   =            >
+< Error(94,32): Invalid char value >
+<   94:33        ID-29     a            >
+< Error(94,42): Invalid char value >
+<   94:43        punct     \            >
+<   94:44        ID-31     n            >
+< Error(94,46): Missing terminating ' character >
+<   95:8         keyword   int          >
+< Error(95,12): ID cannot start with digits >
+<   95:15        ID-32     abc          >
+<   95:16        punct     ;            >
+<   96:8         keyword   int          >
+<   96:10        ID-33     c            >
+<   96:12        asgn-op   =            >
+<   96:17        num       1e+3         >
+<   96:18        punct     ;            >
+<   97:8         keyword   int          >
+<   97:10        ID-34     d            >
+<   97:12        asgn-op   =            >
+< Error(97,15): Exponent has no digits >
+< Error(97,15): ID cannot start with digits >
+<   97:16        punct     ,            >
+<   97:18        ID-35     e            >
+<   97:20        asgn-op   =            >
+< Error(97,23): Invalid number pattern (double dots) >
+< Error(97,23): ID cannot start with digits >
+< Error(97,26): Invalid number pattern (double dots) >
+< Error(97,26): ID cannot start with digits >
+<   97:27        num       1            >
+<   97:28        punct     ;            >
+<   98:11        ID-25     printf       >
+<   98:12        punct     (            >
+<   98:18        string    -            >
+<   98:19        punct     ,            >
+<   98:24        char      '\n'         >
+<   98:25        punct     )            >
+<   98:26        punct     ;            >
+<   99:9         keyword   char         >
+<   99:11        arith-op  *            >
+<   99:14        ID-36     str          >
+<   99:16        asgn-op   =            >
+< Error(99,26): Missing terminating " character >
+<  100:2         punct     }            >
 ---------------ID table------------------
 1    	math
 2    	h
@@ -440,23 +474,29 @@
 25   	printf
 26   	Delete
 27   	main
-28   	a
-29   	b
-30   	abc
+28   	s
+29   	a
+30   	a1
+31   	n
+32   	abc
+33   	c
+34   	d
+35   	e
+36   	str
 ---------------Analysis------------------
-1    	ID        	130
-2    	arith-op  	13
-3    	asgn-op   	10
+1    	ID        	137
+2    	arith-op  	15
+3    	asgn-op   	15
 4    	char      	2
 5    	comments  	19
-6    	keyword   	38
+6    	keyword   	42
 7    	logic-op  	3
-8    	num       	13
+8    	num       	15
 9    	ptr-op    	16
-10   	punct     	126
+10   	punct     	130
 11   	relop-op  	18
-12   	string    	4
+12   	string    	5
 ------------------Total------------------
-Total lines: 96
-Total words: 373
-Total characters: 2320
+Total lines: 100
+Total words: 399
+Total characters: 2431

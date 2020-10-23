@@ -13,14 +13,19 @@ FILE *fp;
 
 %}
 
-delim     	 [' '\t]+
+delim     	 ([' ']|[\t])+
+ANY			 [.]
 WARP      	 [\n]
 NOTWARP   	 [^\n]
 letter    	 [A-Za-z]
 digit     	 [0-9]
 NOTSTR		 [^\"]
 NOTCHAR      [^\']
+ESC			 [\\]
+NOTESC		 [^\\]
 KEYWORD		 include|define|char|short|int|unsigned|long|float|double|struct|union|void|enum|signed|const|volatile|typedef|auto|register|static|extern|break|case|continue|default|do|else|for|goto|if|return|switch|while|sizeof
+STR     	 \"{NOTWARP}*\"
+CHAR         ({delim}?\'{NOTESC}?\')|({delim}?\'{ESC}{letter}?\')
 PUNC		 \,|\;
 DOT			 \.
 RELOP        \=\=|\<|\>|\<\=|\>\=
@@ -29,14 +34,13 @@ OPERATOR     \+|\-|\*|\\|\&|\||\^|\?|\%|\+\+|\-\-|\+\=|\-\=|\*\=|\/\=
 BRACKET      \(|\)|\{|\}|\[|\]
 ID        	 ({letter}|\_)({letter}|{digit}|\_)*
 NUM       	 {digit}+(\.{digit}+)?(E(\+|\-)?digit+)?
-STR     	 \"{NOTWARP}*\"
-CHAR         \'{NOTWARP}\'
 MACRO		 \#
 INCLUDELIB	 \<({letter}|{digit}|{DOT})*\>
 LINECOMMENT  \/\/{NOTWARP}*
 error1   	 {digit}+{letter}+({letter}|{digit})*
-error2       (\"{NOTSTR}*)|(\'{NOTCHAR})
+error2       (\"{NOTSTR}*)
 error3       @|~|`
+error4		 (({delim}?\'{NOTESC}{NOTCHAR}))|(({delim}?\'{ESC}{NOTCHAR}{NOTCHAR}))
 %x        	 IN_COMMENT
 
 %%
@@ -45,126 +49,115 @@ error3       @|~|`
 	charCount+=yyleng;
 	}
 {KEYWORD}      {
-	printf("KEYWORD: %s\n",yytext);
-	fprintf(fp,"KEYWORD: %s\n",yytext);
+	fprintf(fp,"KEYWORD(%d, %d): %s\n",lineCount,columnCount,yytext);
 	columnCount+=yyleng;
 	charCount+=yyleng;
 	wordCount++;
 	}
 {ID}           {
-	printf("ID%d: %s\n",IDCount,yytext);
-	fprintf(fp,"ID%d: %s\n",IDCount,yytext);
+	fprintf(fp,"ID%d(%d, %d): %s\n",IDCount,lineCount,columnCount,yytext);
 	IDCount++;
 	columnCount+=yyleng;
 	charCount+=yyleng;
 	wordCount++;
 	}
 {NUM}          {
-	printf("NUM: %s\n",yytext);
-	fprintf(fp,"NUM: %s\n",yytext);
+	fprintf(fp,"NUM(%d, %d): %s\n",lineCount,columnCount,yytext);
 	columnCount+=yyleng;
 	charCount+=yyleng;
 	}
 {LINECOMMENT}  {
-	printf("LINENOTE: %s\n",yytext);
-	fprintf(fp,"LINENOTE: %s\n",yytext);
+	fprintf(fp,"LINENOTE(%d, %d): %s\n",lineCount,columnCount,yytext);
 	}
 {STR}          {
-	printf("STRING%d: %s\n",stringCount,yytext);
-	fprintf(fp,"STRING%d: %s\n",stringCount,yytext);
+	fprintf(fp,"STRING%d(%d, %d): %s\n",stringCount,lineCount,columnCount,yytext);
 	stringCount++;
 	columnCount+=yyleng;
 	charCount+=yyleng;
 	}
 {CHAR}         {
-	printf("CHAR: %s\n",yytext);
-	fprintf(fp,"CHAR: %s\n",yytext);
-	columnCount++;
-	charCount++;
+	fprintf(fp,"CHAR(%d, %d): %s\n",lineCount,columnCount,yytext);
+	columnCount+=yyleng;
+	charCount+=yyleng;
 	}
 {PUNC}	       {
-	printf("PUNCTUATION: %s\n",yytext);
-	fprintf(fp,"PUNCTUATION: %s\n",yytext);
+	fprintf(fp,"PUNCTUATION(%d, %d): %s\n",lineCount,columnCount,yytext);
 	columnCount++;
 	charCount++;
 	}
 {DOT}		   {
-	printf("DOT: %s\n",yytext);
-	fprintf(fp,"DOT: %s\n",yytext);
+	fprintf(fp,"DOT(%d, %d): %s\n",lineCount,columnCount,yytext);
 	columnCount++;
 	charCount++;
 	}
 {MACRO}		   {
-	printf("MACRO: %s\n",yytext);
-	fprintf(fp,"MACRO: %s\n",yytext);
+	fprintf(fp,"MACRO(%d, %d): %s\n",lineCount,columnCount,yytext);
 	columnCount++;
 	charCount++;
 	}
 {OPERATOR}     {
-	printf("OPERATOR: %s\n",yytext);
-	fprintf(fp,"OPERATOR: %s\n",yytext);
+	fprintf(fp,"OPERATOR(%d, %d): %s\n",lineCount,columnCount,yytext);
 	columnCount++;
 	charCount++;
 	}
 {RELOP}        {
-	printf("RELOP: %s\n",yytext);
-	fprintf(fp,"RELOP: %s\n",yytext);
+	fprintf(fp,"RELOP(%d, %d): %s\n",lineCount,columnCount,yytext);
 	columnCount+=yyleng;
 	charCount+=yyleng;
 	}
 {EQUAL}		   {
-	printf("EQUAL: %s\n",yytext);
-	fprintf(fp,"EQUAL: %s\n",yytext);
+	fprintf(fp,"EQUAL(%d, %d): %s\n",lineCount,columnCount,yytext);
 	columnCount++;
 	charCount++;
 	}
 {BRACKET}      {
-	printf("BRACKET: %s\n",yytext);
-	fprintf(fp,"BRACKET: %s\n",yytext);
+	fprintf(fp,"BRACKET(%d, %d): %s\n",lineCount,columnCount,yytext);
 	columnCount+=yyleng;
 	charCount+=yyleng;
 	}
 {INCLUDELIB}   {
-	printf("INCLUDE: %s\n",yytext);
-	fprintf(fp,"INCLUDE: %s\n",yytext);
+	fprintf(fp,"INCLUDE(%d, %d): %s\n",lineCount,columnCount,yytext);
 	columnCount+=yyleng;
 	charCount+=yyleng;
 	}
 {error1}       {
-	printf("ERROR: Line %d, Column %d: Identity cannot start with number.\"%s\"\n",lineCount,columnCount+1,yytext);
-	fprintf(fp,"ERROR: Line %d, Column %d: Identity cannot start with number.\"%s\"\n",lineCount,columnCount+1,yytext);
+	fprintf(fp,"ERROR: Line %d, Column %d: Identity cannot start with number \"%s\"\n",lineCount,columnCount+1,yytext);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	}
+{error2}       {
+	fprintf(fp,"ERROR:Line %d, Column %d: String cannot match the left puncuation \n",lineCount,columnCount+1);
 	columnCount+=yyleng;
 	charCount+=yyleng;
 	}
 {error3}       {
-	printf("ERROR: Line %d, Column %d: Invalid symbol.\"%s\"\n",lineCount,columnCount+1,yytext);
-	fprintf(fp,"ERROR: Line %d, Column %d: Invalid symbol.\"%s\"\n",lineCount,columnCount+1,yytext);
+	fprintf(fp,"ERROR: Line %d, Column %d: Invalid symbol \"%s\"\n",lineCount,columnCount+1,yytext);
 	columnCount+=yyleng;
-	charCount+=yyleng;}
+	charCount+=yyleng;
+	}
+{error4}	   {
+	fprintf(fp,"ERROR: Line %d, Column %d: Invalid char pattern \"%s\"\n",lineCount,columnCount+1,yytext);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+}
 
 <INITIAL>{
 "/*"           BEGIN(IN_COMMENT);yymore();
 }
 <IN_COMMENT>{
-"*/"           printf("ANNODATE: %s\n",yytext);fprintf(fp,"ANNODATE: %s\n",yytext);BEGIN(INITIAL);
+"*/"           fprintf(fp,"ANNODATE(%d, %d): %s\n",lineCount,columnCount,yytext);BEGIN(INITIAL);
 [^*\n]+	       yymore();
 "*"            yymore();
 \n             lineCount++;yymore();
 }
 
-{error2}       {
-	printf("ERROR:Line %d, Column %d: Cannot Match the Left Puncuation.\n",lineCount,columnCount+1);
-	fprintf(fp,"ERROR:Line %d, Column %d: Cannot Match the Left Puncuation.\n",lineCount,columnCount+1);
-	columnCount+=yyleng;
-	charCount+=yyleng;
-	}
+
 {WARP}         {
 	lineCount++;
 	columnCount=0;
 	}
 .              {
-	printf("UNKNOW: %s\n",yytext);
-	fprintf(fp,"UNKNOW: %s\n",yytext);
+	fprintf(fp,"UNKNOW(%d, %d): %s\n",lineCount,columnCount,yytext);
 	charCount++;
 	columnCount++;
 	}

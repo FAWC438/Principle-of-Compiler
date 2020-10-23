@@ -22,7 +22,8 @@ vector<string> table;
 map<string, int> counter_map;
 
 /**
- * @brief 向符号表中插入符号。这个符号可能已经存在，也可能是新符号。若为新符号，插入符号表末尾。
+ * @brief 向符号表中插入符号。这个符号可能已经存在，也可能是新符号。
+ * 若为新符号，插入符号表末尾。
  * 
  * @return int 返回插入的符号在符号表的位置，若是新符号，则一定在符号表的末尾
  */
@@ -49,11 +50,13 @@ int table_insert()
  * 状态5为读取指数符号后数字的状态。
  * 
  * @param state_param 状态参数，输入1则开始判断实数
+ * @return true 发生了错误
+ * @return false 未发生错误
  */
 bool test_digits(int state_param)
 {
     int state = state_param;
-    bool not_end_boolen = true, is_wrong_ID = false;
+    bool not_end_boolen = true, is_error = false;
 
     while ((ptr_forward != buffer.end()) && not_end_boolen)
     {
@@ -65,13 +68,13 @@ bool test_digits(int state_param)
             {
                 token.append(1, *ptr_forward++);
                 column++;
-                state = 23;
+                state = 2;
             }
             else if (*ptr_forward == 'E' || *ptr_forward == 'e')
             {
                 token.append(1, *ptr_forward++);
                 column++;
-                state = 4;
+                state = 3;
             }
             else if (isdigit(*ptr_forward))
             {
@@ -86,17 +89,23 @@ bool test_digits(int state_param)
 
         case 2:
             // 读取到小数点
-            if (*ptr_forward == 'E' || *ptr_forward == 'e')
+            if (token.find('.') != string::npos)
+            {
+                out_file_stream << "< Error(" << line << "," << column << "): Invalid number pattern (double dots) >" << endl;
+                is_error = true;
+                not_end_boolen = false;
+            }
+            else if (*ptr_forward == 'E' || *ptr_forward == 'e')
             {
                 token.append(1, *ptr_forward++);
                 column++;
-                state = 4;
+                state = 3;
             }
             else if (isdigit(*ptr_forward))
             {
                 token.append(1, *ptr_forward++);
                 column++;
-                state = 2;
+                state = 1;
             }
             else
                 not_end_boolen = false;
@@ -120,6 +129,7 @@ bool test_digits(int state_param)
             else
             {
                 out_file_stream << "< Error(" << line << "," << column << "): Exponent has no digits >" << endl;
+                is_error = true;
                 not_end_boolen = false;
             }
 
@@ -136,13 +146,14 @@ bool test_digits(int state_param)
             else
             {
                 out_file_stream << "< Error(" << line << "," << column << "): Exponent has no digits >" << endl;
+                is_error = true;
                 not_end_boolen = false;
             }
 
             break;
 
         case 5:
-            // 指数数字部分
+            // 仅数字部分
             if (isdigit(*ptr_forward))
             {
                 token.append(1, *ptr_forward++);
@@ -157,13 +168,16 @@ bool test_digits(int state_param)
         default:
             // 实际上代码不可能运行到此处
             out_file_stream << "< Error(" << line << "," << column << "): Function test_digits() Error! >" << endl;
+            not_end_boolen = false;
+            is_error = true;
             break;
         }
     }
-    if (!((*ptr_forward >= 'a' && *ptr_forward <= 'z') || (*ptr_forward >= 'A' && *ptr_forward <= 'Z') || *ptr_forward == '_'))
+
+    if ((*ptr_forward >= 'a' && *ptr_forward <= 'z') || (*ptr_forward >= 'A' && *ptr_forward <= 'Z') || *ptr_forward == '_')
         return true;
-    else
-        return false;
+
+    return is_error;
 }
 
 /**
@@ -406,7 +420,7 @@ int main()
                 token.append(1, C);
                 ptr_forward++;
                 column++;
-                if (test_digits(1)) // 读取无符号实数剩余部分
+                if (!test_digits(1)) // 读取无符号实数剩余部分
                 {
                     output_line("num");
                     cnt_word++;
@@ -833,7 +847,7 @@ int main()
                         // 小数点
                         token.append(1, *ptr_forward++);
                         column++;
-                        if (test_digits(2)) // 读取无符号实数剩余部分
+                        if (!test_digits(2)) // 读取无符号实数剩余部分
                         {
                             output_line("num");
                             cnt_word++;

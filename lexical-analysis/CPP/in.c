@@ -90,7 +90,11 @@ bool Delete(List L, Position P)
 
 int main()
 {
-    char a = 'a1', b = '\n';
+    char *s = "12av";
+    char a = 'a',a1 = 'r, b = 'a';
     int 123abc;
+    int c = 1e+3;
+    int d = 2e, e = 1.23.1;
     printf("%c\n", '\n');
+    char *str = "abcdefg;
 }

@@ -25,8 +25,7 @@
 > _4._ [运行结果及分析](#运行结果及分析)
 >
 > - [输入](#输入)
-> - [运行结果](#运行结果)
-> - [分析说明](#分析说明)
+> - [运行结果及其说明](#运行结果及其说明)
 >
 > _5._ [源程序](#源程序)
 >
@@ -109,7 +108,7 @@ _词法分析器_：flex on Linux
 
 ### 运行说明
 
-#### C++
+#### C++ 版本
 
 欲编译本程序并生成可执行文件，请在**源程序所在目录**的 Linux bash 中输入如下指令：
 
@@ -121,7 +120,7 @@ _词法分析器_：flex on Linux
 
     ./analysis
 
-#### LEX
+#### LEX 版本
 
 欲编译本程序并生成可执行文件，请在**源程序所在目录**的 Linux bash 中依次输入如下指令：
 
@@ -149,6 +148,8 @@ C++版本的程序源文件内容**每次一行**地读入缓冲 buffer 中，�
 4. _Missing terminating \' character_：字符未匹配到末尾的冒号
 
 5. _Invalid char value_：非法的字符，正确的字符格式为`'a'`、`'\n'`等，非法的字符格式为`'a1'`、`'b\t'`等
+
+6. _Invalid number pattern (double dots)_：一个数字出现了两个逗号
 
 ### 数据结构
 
@@ -215,269 +216,1282 @@ map<string, int> counter_map;
 
 > 本部分仅讨论 C++ 版本程序
 
+下方的注释解释了所有函数的接口及其用法。
+
+```cpp
+/**
+ * @brief 向符号表中插入符号。这个符号可能已经存在，也可能是新符号。
+ * 若为新符号，插入符号表末尾。
+ *
+ * @return int 返回插入的符号在符号表的位置，若是新符号，则一定在符号表的末尾
+ */
+int table_insert()
+
+/**
+ * @brief 读取并测试实数，其中包含浮点数或带有E/e的指数。
+ * 注意，本函数涉及状态转换。
+ * 状态1为初始状态，读取实数；
+ * 状态2为读取小数点后数字的状态；
+ * 状态3为读取指数符号后数字的状态；
+ * 状态4为读取指数符号后的缓冲态，以防止指数符号后出现+/-符号；
+ * 状态5为读取指数符号后数字的状态。
+ *
+ * @param state_param 状态参数，输入1则开始判断实数
+ * @return true 正确的数字格式
+ * @return false 数字后紧接着记号字符，请输出错误的记号提示
+ */
+bool test_digits(int state_param)
+
+/**
+ * @brief 测试注释内容
+ *
+ * @return true 注释通过词法分析
+ * @return false 读到错误或EOF
+ */
+bool test_comments()
+
+/**
+ * @brief 封装输出样式
+ *
+ * @param type_str 输出的记号类型
+ */
+void output_line(string type_str)
+
+/**
+ * @brief 在输出开头展示说明文本
+ *
+ */
+void show_head_word()
+
+/**
+ * @brief 展示结果文本并关闭IO流
+ *
+ */
+void show_result()
+```
+
 ---
 
 ## 运行结果及分析
 
-依照[运行说明](#运行说明)所述方式运行程序后，在控制台中输入数字`35`，得到结果如下：
+> 本部分仅讨论 C++ 版本程序
 
-    kevin_ling@Spear-of-Adun:~/Operating-System/ch4_homework$ ./thread
-    35
-    The average value is 35
-    The minimum value is 35
-    The maximum value is 35
-    kevin_ling@Spear-of-Adun:~/Operating-System/ch4_homework$
+### 输入
 
-下方流程图有助于理解本程序的运行过程
+测试的输入文件为其它部分均正确的 C 语言代码（详见`in.c`），在其 main 函数中设置几处词法错误如下：
 
-![avatar](https://github.com/FAWC-bupt/Operating-System/blob/main/ch4_homework/flow_chart.jpg)
-
-从流程图可以看出，在多线程操作中，由于采用了 pthread_join()函数，主线程将被阻塞，同一时间只有可能运行一个线程。一旦子线程结束，主线程就结束阻塞状态，输出子线程的结果并调用另一个子线程。因此，本程序的执行结果和顺序执行的代码类似，结果是确定的。
-
-但是，当结主线程不加阻塞会发生什么呢？用指令`./thread_no_block`运行非阻塞版本的程序，结果如下。
-
-    kevin_ling@Spear-of-Adun:~/Operating-System/ch4_homework$ ./thread_no_block
-    35
-    The average value is 0
-    The minimum value is 0
-    The maximum value is 0
-    kevin_ling@Spear-of-Adun:~/Operating-System/ch4_homework$
-
-可以看到，程序均输出 3 个全局变量的初始值 0。这是因为在非阻塞条件下，主线程还没等待子线程完成运算任务就将结果输出。此时的变量就仍然还是初始化的值了。
-
-## 源程序
-
-### 原版
-
-```c
-#include <errno.h>
-#include <limits.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <sys/types.h>
-
-/*
-    切记链接上 -lpthread 库
-*/
-
-int avg_num, max_num, min_num, len = 0; // 题目要求的3个全局变量
-int pthread_kill(pthread_t thread, int sig);
-
-/**
- * @brief Get the Avg object
- *
- * @param param
- * @return void*
- */
-void *getAvg(void *param)
+```cpp
+int main()
 {
-    int *seq = (int *)param, sum = 0;
-
-    for (size_t i = 0; i < len; i++)
-        sum += seq[i];
-
-    avg_num = sum / len;
-
-    pthread_exit(0);
-}
-
-/**
- * @brief Get the Max object
- *
- * @param param
- * @return void*
- */
-void *getMax(void *param)
-{ /* the thread */
-
-    int *seq = (int *)param, max_temp = INT_MIN;
-
-    for (size_t i = 0; i < len; i++)
-        if (seq[i] > max_temp)
-            max_temp = seq[i];
-
-    max_num = max_temp;
-
-    pthread_exit(0);
-}
-
-/**
- * @brief Get the Min object
- *
- * @param param
- * @return void*
- */
-void *getMin(void *param)
-{ /* the thread */
-
-    int *seq = (int *)param, min_temp = INT_MAX;
-
-    for (size_t i = 0; i < len; i++)
-        if (seq[i] < min_temp)
-            min_temp = seq[i];
-
-    min_num = min_temp;
-
-    pthread_exit(0);
-}
-
-int main(int argc, char *argv[])
-{
-    int arr[1024], kill_rc;
-    char c = '0';
-
-    while (c != '\n')
-    {
-        scanf("%d", &arr[len]);
-        c = getchar();
-        len++;
-    }
-
-    pthread_t tid1, tid2, tid3;
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-
-    // 线程1
-    pthread_create(&tid1, &attr, getAvg, arr);
-    pthread_join(tid1, NULL);
-    /*
-        pthread_kill()函数用于判断线程是否结束。
-        这么做的原因是，题目要求必须在子线程结束后输出结果。
-        尽管pthread_join()作用就是以阻塞的方式等待thread指定的线程结束，
-        但是使用pthread_kill()能增加程序容错性和鲁棒性。
-    */
-    kill_rc = pthread_kill(tid1, 0);
-    if (kill_rc == ESRCH)
-        printf("The average value is %d\n", avg_num);
-    else if (kill_rc == EINVAL)
-        printf("signal is invalid\n");
-    else
-        printf("the thread 1 is still alive\n");
-
-    // 线程2
-    pthread_create(&tid2, &attr, getMin, arr);
-    pthread_join(tid2, NULL);
-    kill_rc = pthread_kill(tid2, 0);
-    if (kill_rc == ESRCH)
-        printf("The minimum value is %d\n", min_num);
-    else if (kill_rc == EINVAL)
-        printf("signal is invalid\n");
-    else
-        printf("the thread 2 is still alive\n");
-
-    // 线程3
-    pthread_create(&tid3, &attr, getMax, arr);
-    pthread_join(tid3, NULL);
-    kill_rc = pthread_kill(tid3, 0);
-    if (kill_rc == ESRCH)
-        printf("The maximum value is %d\n", max_num);
-    else if (kill_rc == EINVAL)
-        printf("signal is invalid\n");
-    else
-        printf("the thread 3 is still alive\n");
+    char *s = "12av";
+    char a = 'a',a1 = 'r, b = 'a';  // 字符错误
+    int 123abc; // 记号错误
+    int c = 1e+3;
+    int d = 2e, e = 1.23.1; // 指数错误，小数点错误
+    printf("%c\n", '\n');
+    char *str = "abcdefg;   // 字符串错误
 }
 ```
 
-### 非阻塞版
+### 运行结果及其说明
 
-```c
-#include <errno.h>
-#include <limits.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <sys/types.h>
+运行结果较长，此处将节选运行结果进行说明，详细内容请见`out.txt`。
 
-/*
-    切记链接上 -lpthread 库
-*/
+> 若欲查看 LEX 版本的分析结果，请将欲分析代码复制至 LEX 文件夹的 test1.c 中，并根据[运行说明](#运行说明)所指示的步骤运行 LEX 版本代码。
 
-int avg_num, max_num, min_num, len = 0; // 题目要求的3个全局变量
-int pthread_kill(pthread_t thread, int sig);
+                Specification
+
+    [ID-<number>]: 用户定义或额外导入的库函数中的记号
+    [keyword]: C语言保留字
+    [num]: 全体实数，支持指数表示
+    [comments]: 注释
+    [punct]: 标点符号
+    [char]: 字符
+    [string]: 字符串
+    [arith-op]: 算数运算符
+    [asgn-op]: 复合运算符
+    [ptr-op]: 指针运算符
+    [bit-op]: 位运算符
+    [logic-op]: 逻辑运算符
+    [relop-op]: 关系运算符
+
+    请注意：以下的Column对于多个字符的记号来说，指向的是其最后一个字符所在的列数
+
+`out.txt`的最上方显示了单词类型提示和注意事项。
+
+    ----------------Result-------------------
+    Line:Column    Type      Token
+    <    1:2         punct     #            >
+    <    1:9         keyword   include      >
+    <    1:11        relop-op  <            >
+    <    1:15        ID-1      math         >
+    <    1:16        punct     .            >
+    <    1:17        ID-2      h            >
+    <    1:18        relop-op  >            >
+    <    2:2         punct     #            >
+    <    2:9         keyword   include      >
+    ...
+
+`out.txt`的主体部分如上所示，通过一个三元组，表示了一个单词的行列数、类型以及其内容。由于中文字符在 C 语言中的编码以及字符串和注释的长度可能过长等原因，Token 部分将不显示字符串和注释的内容。
+
+    ...
+    < Error(97,15): Exponent has no digits >
+    < Error(97,15): ID cannot start with digits >
+    <   97:16        punct     ,            >
+    <   97:18        ID-35     e            >
+    <   97:20        asgn-op   =            >
+    < Error(97,23): Invalid number pattern (double dots) >
+    < Error(97,23): ID cannot start with digits >
+    < Error(97,26): Invalid number pattern (double dots) >
+    < Error(97,26): ID cannot start with digits >
+    <   97:27        num       1            >
+    <   97:28        punct     ;            >
+    <   98:11        ID-25     printf       >
+    <   98:12        punct     (            >
+    <   98:18        string    -            >
+    <   98:19        punct     ,            >
+    <   98:24        char      '\n'         >
+    <   98:25        punct     )            >
+    <   98:26        punct     ;            >
+    <   99:9         keyword   char         >
+    <   99:11        arith-op  *            >
+    <   99:14        ID-36     str          >
+    <   99:16        asgn-op   =            >
+    < Error(99,26): Missing terminating " character >
+    <  100:2         punct     }            >
+
+在 main 函数的部分，可以看到词法分析器成功检测到了词法错误，并通过适当修整使得词法分析能够顺利进行。
+
+    ---------------ID table------------------
+    1    	math
+    2    	h
+    3    	stdio
+    4    	stdlib
+    5    	string
+    6    	bool
+    7    	false
+    8    	true
+    9    	MAXSIZE
+    10   	ElementType
+    11   	Position
+    12   	LNode
+    13   	List
+    14   	Data
+    15   	Last
+    16   	MakeEmpty
+    17   	L
+    18   	malloc
+    ...
+
+在主体内容的下方，`out.txt`还记录了所有检测到的记录（ID），并展示了其序号和内容。
+
+    ---------------Analysis------------------
+    1    	ID        	137
+    2    	arith-op  	15
+    3    	asgn-op   	15
+    4    	char      	2
+    5    	comments  	19
+    6    	keyword   	42
+    7    	logic-op  	3
+    8    	num       	15
+    9    	ptr-op    	16
+    10   	punct     	130
+    11   	relop-op  	18
+    12   	string    	5
+    ------------------Total------------------
+    Total lines: 100
+    Total words: 399
+    Total characters: 2431
+
+在`out.txt`最下方，给出了词法分析的综合结果，这里记录了所有源文件中各种类型词语的数量，同时也记录了源文件的总行数和词语、字符数量。
+
+---
+
+## 源程序
+
+### C++
+
+```cpp
+#include <algorithm>
+#include <cctype>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+int line = 0, column = 0, cnt_word = 0, cnt_char = 0;
+
+ifstream in_file_stream;
+ofstream out_file_stream;
+
+string in_file_str, out_file_str, buffer, token;
+string::iterator ptr_forward = buffer.end(); // 向前指针
+string words[] = {"include", "define", "auto", "double", "int", "struct", "break", "else", "long", "switch", "case", "enum", "register", "typedef", "char", "extern", "return", "union", "const", "float", "short", "unsigned", "continue", "for", "signed", "void", "default", "goto", "sizeof", "volatile", "do", "if", "static", "while"};
+vector<string> table;
+map<string, int> counter_map;
 
 /**
- * @brief Get the Avg object
+ * @brief 向符号表中插入符号。这个符号可能已经存在，也可能是新符号。
+ * 若为新符号，插入符号表末尾。
  *
- * @param param
- * @return void*
+ * @return int 返回插入的符号在符号表的位置，若是新符号，则一定在符号表的末尾
  */
-void *getAvg(void *param)
+int table_insert()
 {
-    int *seq = (int *)param, sum = 0;
+    vector<string>::iterator it = find(table.begin(), table.end(), token);
 
-    for (size_t i = 0; i < len; i++)
-        sum += seq[i];
-
-    avg_num = sum / len;
-
-    pthread_exit(0);
-}
-
-/**
- * @brief Get the Max object
- *
- * @param param
- * @return void*
- */
-void *getMax(void *param)
-{ /* the thread */
-
-    int *seq = (int *)param, max_temp = INT_MIN;
-
-    for (size_t i = 0; i < len; i++)
-        if (seq[i] > max_temp)
-            max_temp = seq[i];
-
-    max_num = max_temp;
-
-    pthread_exit(0);
-}
-
-/**
- * @brief Get the Min object
- *
- * @param param
- * @return void*
- */
-void *getMin(void *param)
-{ /* the thread */
-
-    int *seq = (int *)param, min_temp = INT_MAX;
-
-    for (size_t i = 0; i < len; i++)
-        if (seq[i] < min_temp)
-            min_temp = seq[i];
-
-    min_num = min_temp;
-
-    pthread_exit(0);
-}
-
-int main(int argc, char *argv[])
-{
-    int arr[1024], kill_rc;
-    char c = '0';
-
-    while (c != '\n')
+    if (it == table.end())
     {
-        scanf("%d", &arr[len]);
-        c = getchar();
-        len++;
+        table.push_back(token);
+        it = find(table.begin(), table.end(), token);
     }
 
-    pthread_t tid1, tid2, tid3;
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
+    return distance(table.begin(), it) + 1;
+}
 
-    // 线程1
-    pthread_create(&tid1, &attr, getAvg, arr);
-    printf("The average value is %d\n", avg_num);
+/**
+ * @brief 读取并测试实数，其中包含浮点数或带有E/e的指数。
+ * 注意，本函数涉及状态转换。
+ * 状态1为初始状态，读取实数；
+ * 状态2为读取小数点后数字的状态；
+ * 状态3为读取指数符号后数字的状态；
+ * 状态4为读取指数符号后的缓冲态，以防止指数符号后出现+/-符号；
+ * 状态5为读取指数符号后数字的状态。
+ *
+ * @param state_param 状态参数，输入1则开始判断实数
+ * @return true 发生了错误
+ * @return false 未发生错误
+ */
+bool test_digits(int state_param)
+{
+    int state = state_param;
+    bool not_end_boolen = true, is_error = false;
 
-    // 线程2
-    pthread_create(&tid2, &attr, getMin, arr);
-    printf("The minimum value is %d\n", min_num);
+    while ((ptr_forward != buffer.end()) && not_end_boolen)
+    {
+        switch (state)
+        {
+        case 1:
+            // 数字部分
+            if (*ptr_forward == '.')
+            {
+                token.append(1, *ptr_forward++);
+                column++;
+                state = 2;
+            }
+            else if (*ptr_forward == 'E' || *ptr_forward == 'e')
+            {
+                token.append(1, *ptr_forward++);
+                column++;
+                state = 3;
+            }
+            else if (isdigit(*ptr_forward))
+            {
+                token.append(1, *ptr_forward++);
+                column++;
+                state = 1;
+            }
+            else
+                not_end_boolen = false; // 识别结束
 
-    // 线程3
-    pthread_create(&tid3, &attr, getMax, arr);
-    printf("The maximum value is %d\n", max_num);
+            break;
+
+        case 2:
+            // 读取到小数点
+            if (token.find('.') != string::npos)
+            {
+                out_file_stream << "< Error(" << line << "," << column << "): Invalid number pattern (double dots) >" << endl;
+                is_error = true;
+                not_end_boolen = false;
+            }
+            else if (*ptr_forward == 'E' || *ptr_forward == 'e')
+            {
+                token.append(1, *ptr_forward++);
+                column++;
+                state = 3;
+            }
+            else if (isdigit(*ptr_forward))
+            {
+                token.append(1, *ptr_forward++);
+                column++;
+                state = 1;
+            }
+            else
+                not_end_boolen = false;
+
+            break;
+
+        case 3:
+            // 读取到指数符号
+            if (*ptr_forward == '+' || *ptr_forward == '-')
+            {
+                token.append(1, *ptr_forward++);
+                column++;
+                state = 4;
+            }
+            else if (isdigit(*ptr_forward))
+            {
+                token.append(1, *ptr_forward++);
+                column++;
+                state = 5;
+            }
+            else
+            {
+                out_file_stream << "< Error(" << line << "," << column << "): Exponent has no digits >" << endl;
+                is_error = true;
+                not_end_boolen = false;
+            }
+
+            break;
+
+        case 4:
+            // +/-号后必须有一个数字
+            if (isdigit(*ptr_forward))
+            {
+                token.append(1, *ptr_forward++);
+                column++;
+                state = 5;
+            }
+            else
+            {
+                out_file_stream << "< Error(" << line << "," << column << "): Exponent has no digits >" << endl;
+                is_error = true;
+                not_end_boolen = false;
+            }
+
+            break;
+
+        case 5:
+            // 仅数字部分
+            if (isdigit(*ptr_forward))
+            {
+                token.append(1, *ptr_forward++);
+                column++;
+                state = 5;
+            }
+            else
+                not_end_boolen = false;
+
+            break;
+
+        default:
+            // 实际上代码不可能运行到此处
+            out_file_stream << "< Error(" << line << "," << column << "): Function test_digits() Error! >" << endl;
+            not_end_boolen = false;
+            is_error = true;
+            break;
+        }
+    }
+
+    if ((*ptr_forward >= 'a' && *ptr_forward <= 'z') || (*ptr_forward >= 'A' && *ptr_forward <= 'Z') || *ptr_forward == '_')
+        return true;
+
+    return is_error;
+}
+
+/**
+ * @brief 测试注释内容
+ *
+ * @return true 注释通过词法分析
+ * @return false 读到错误或EOF
+ */
+bool test_comments()
+{
+    while (true)
+    {
+        while ((ptr_forward != buffer.end()) && (*ptr_forward != '*'))
+        {
+            token.append(1, *ptr_forward++);
+            column++;
+        }
+
+        if (ptr_forward == buffer.end())
+        {
+            if (getline(in_file_stream, buffer, '\n'))
+            {
+                // 一行注释结束，继续下一行
+                line++;
+                ptr_forward = buffer.begin();
+                column = 1;
+                continue;
+            }
+            else
+                return false;
+        }
+        else
+        {
+            // 读到注释结束符的星号
+            token.append(1, *ptr_forward++);
+            column++;
+
+            if (ptr_forward == buffer.end()) // 若 '*/' 被换行分开，则继续读取下一行
+                continue;
+            else if (*ptr_forward == '/')
+            {
+                // 注释结束
+                token.append(1, *ptr_forward++);
+                column++;
+                return true;
+            }
+            else // 星号后是其他字符，仍继续读取注释
+                continue;
+        }
+    }
+}
+
+/**
+ * @brief 封装输出样式
+ *
+ * @param type_str 输出的记号类型
+ */
+void output_line(string type_str)
+{
+    string type_str_finder = type_str;
+    if (type_str_finder.substr(0, 2) == "ID")
+        type_str_finder = "ID";
+
+    map<string, int>::iterator iter = counter_map.find(type_str_finder);
+    if (iter != counter_map.end())
+        counter_map[type_str_finder]++;
+    else
+        counter_map[type_str_finder] = 1;
+
+    if (type_str == "comments" || type_str == "string")
+    {
+        out_file_stream << "<"
+                        << right << setw(5) << line << ":"
+                        << left << setw(10) << column
+                        << left << setw(10) << type_str
+                        << left << setw(13) << "-"
+                        << ">" << endl;
+    }
+    else
+    {
+        out_file_stream << "<"
+                        << right << setw(5) << line << ":"
+                        << left << setw(10) << column
+                        << left << setw(10) << type_str
+                        << left << setw(13) << token << ">" << endl;
+    }
+}
+
+/**
+ * @brief 在输出开头展示说明文本
+ *
+ */
+void show_head_word()
+{
+    out_file_stream << right << setw(25) << "Specification" << endl
+                    << endl;
+    out_file_stream << "[ID-<number>]: 用户定义或额外导入的库函数中的记号" << endl;
+    out_file_stream << "[keyword]: C语言保留字" << endl;
+    out_file_stream << "[num]: 全体实数，支持指数表示" << endl;
+    out_file_stream << "[comments]: 注释" << endl;
+    out_file_stream << "[punct]: 标点符号" << endl;
+    out_file_stream << "[char]: 字符" << endl;
+    out_file_stream << "[string]: 字符串" << endl;
+    out_file_stream << "[arith-op]: 算数运算符" << endl;
+    out_file_stream << "[asgn-op]: 复合运算符" << endl;
+    out_file_stream << "[ptr-op]: 指针运算符" << endl;
+    out_file_stream << "[bit-op]: 位运算符" << endl;
+    out_file_stream << "[logic-op]: 逻辑运算符" << endl;
+    out_file_stream << "[relop-op]: 关系运算符" << endl
+                    << endl;
+    out_file_stream << "请注意：以下的Column对于多个字符的记号来说，指向的是其最后一个字符所在的列数" << endl
+                    << endl;
+    out_file_stream << "----------------Result-------------------" << endl;
+    out_file_stream << right << setw(6) << "Line"
+                    << ":"
+                    << left << setw(10) << "Column"
+                    << left << setw(10) << "Type"
+                    << left << setw(13) << "Token" << endl;
+}
+
+/**
+ * @brief 展示结果文本并关闭IO流
+ *
+ */
+void show_result()
+{
+    int i = 1;
+
+    out_file_stream << "---------------ID table------------------" << endl;
+
+    for (vector<string>::iterator it = table.begin(); it != table.end(); it++)
+        out_file_stream << left << setw(5) << i++ << "\t" << *it << endl;
+
+    i = 1;
+
+    out_file_stream << "---------------Analysis------------------" << endl;
+
+    for (map<string, int>::iterator it = counter_map.begin(); it != counter_map.end(); it++)
+        out_file_stream << left << setw(5) << i++ << "\t" << left << setw(10) << it->first << "\t" << it->second << endl;
+
+    cout << "分析完成，请到目标文件" << out_file_str << "查看输出结果！" << endl;
+    out_file_stream << "------------------Total------------------" << endl;
+    out_file_stream << "Total lines: " << line << endl;
+    out_file_stream << "Total words: " << cnt_word << endl;
+    out_file_stream << "Total characters: " << cnt_char << endl;
+
+    in_file_stream.close();
+    out_file_stream.close();
+}
+
+int main()
+{
+    set<string> keywords(words, words + 34);
+    char C;
+    cout << "请输入源文件名称（回车则默认使用in.c）：" << endl;
+    getline(cin, in_file_str);
+
+    if (in_file_str == "")
+        in_file_str = "in.c";
+
+    in_file_stream.open(in_file_str.c_str());
+
+    if (!in_file_stream)
+    {
+        cout << "无法打开源文件！" << endl;
+        return -1;
+    }
+
+    cout << "请输入目标文件名称（回车则默认使用out.txt）：" << endl;
+    getline(cin, out_file_str);
+
+    if (out_file_str == "")
+        out_file_str = "out.txt";
+
+    out_file_stream.open(out_file_str.c_str());
+
+    if (!out_file_stream)
+    {
+        cout << "无法创建目标文件！" << endl;
+        return -1;
+    }
+
+    show_head_word();
+
+    while (true)
+    {
+        // 前进指针读到缓存末尾
+        if (ptr_forward == buffer.end())
+        {
+            // 读到行末
+            if (getline(in_file_stream, buffer, '\n'))
+            {
+                line++;             // 读取新行
+                cnt_char += column; // 每次换行前加上当前行的字符数
+                ptr_forward = buffer.begin();
+                column = 1;
+            }
+            else // 读到EOF则输出结果
+            {
+                show_result();
+                return 0;
+            }
+        }
+
+        while ((ptr_forward != buffer.end()) && isspace(*ptr_forward))
+        {
+            // 跳过空字符
+            ptr_forward++;
+            column++;
+        }
+
+        if (ptr_forward != buffer.end())
+        {
+            // 未读到缓冲区末尾
+            token = "";
+            C = *ptr_forward;
+
+            if ((C >= 'a' && C <= 'z') || (C >= 'A' && C <= 'Z') || C == '_')
+            {
+                token.append(1, C);
+                ptr_forward++;
+                column++;
+
+                while ((ptr_forward != buffer.end()) && (isalnum(*ptr_forward) || *ptr_forward == '_'))
+                {
+                    // 合法标识符可包含下划线
+                    token.append(1, *ptr_forward++);
+                    column++;
+                }
+
+                if (keywords.count(token) == 0)
+                    output_line("ID-" + to_string(table_insert()));
+                else
+                    output_line("keyword");
+
+                cnt_word++; // 单词数加一
+            }
+            else if (C >= '0' && C <= '9')
+            {
+                token.append(1, C);
+                ptr_forward++;
+                column++;
+                if (!test_digits(1)) // 读取无符号实数剩余部分
+                {
+                    output_line("num");
+                    cnt_word++;
+                }
+                else
+                    out_file_stream << "< Error(" << line << "," << column << "): ID cannot start with digits >" << endl;
+            }
+            else
+            {
+                switch (C)
+                {
+                case '+':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    if (ptr_forward == buffer.end())
+                        output_line("arith-op");
+                    else
+                    {
+                        if (*ptr_forward == '+')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("arith-op");
+                        }
+                        else if (*ptr_forward == '=')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("asgn-op");
+                        }
+                        else
+                            output_line("arith-op");
+                    }
+
+                    cnt_word++;
+                    break;
+
+                case '-':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    if (ptr_forward == buffer.end())
+                        output_line("arith-op");
+                    else
+                    {
+                        if (*ptr_forward == '-')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("arith-op");
+                        }
+                        else if (*ptr_forward == '=')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("asgn-op");
+                        }
+                        else if (*ptr_forward == '>')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("ptr-op");
+                        }
+                        else
+                            output_line("arith-op");
+                    }
+
+                    cnt_word++;
+                    break;
+
+                case '*':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    if (ptr_forward == buffer.end())
+                        output_line("arith-op");
+                    else
+                    {
+                        if (*ptr_forward == '=')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("asgn-op");
+                        }
+                        else
+                            output_line("arith-op");
+                    }
+
+                    cnt_word++;
+                    break;
+
+                case '/':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    if (ptr_forward == buffer.end())
+                    {
+                        output_line("arith-op");
+                        cnt_word++;
+                    }
+                    else
+                    {
+                        if (*ptr_forward == '=')
+                        {
+                            // 除法复合赋值
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("asgn-op");
+                            cnt_word++;
+                        }
+                        else if (*ptr_forward == '/')
+                        {
+                            // 单行注释，读到行末
+                            token.append(1, *ptr_forward++);
+                            column++;
+
+                            while (ptr_forward != buffer.end())
+                            {
+                                token.append(1, *ptr_forward++);
+                                column++;
+                            }
+                            output_line("comments");
+                        }
+                        else if (*ptr_forward == '*')
+                        {
+                            // 多行注释可以换行
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            int ret = test_comments();
+
+                            if (ret)
+                                output_line("comments");
+                            else
+                            {
+                                show_result();
+                                return 0;
+                            }
+                        }
+                        else
+                        {
+                            // 除号后是其他字符，为单个除号
+                            output_line("arith-op");
+                            cnt_word++;
+                        }
+                    }
+
+                    break;
+
+                case '%':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    if (ptr_forward == buffer.end())
+                        output_line("arith-op");
+                    else
+                    {
+                        if (*ptr_forward == '=')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("asgn-op");
+                        }
+                        else
+                            output_line("arith-op");
+                    }
+
+                    cnt_word++;
+                    break;
+
+                case '&':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    if (ptr_forward == buffer.end())
+                        output_line("bit-op");
+                    else
+                    {
+                        if (*ptr_forward == '=')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("asgn-op");
+                        }
+                        else if (*ptr_forward == '&')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("logic-op");
+                        }
+                        else
+                            output_line("bit-op");
+                    }
+
+                    cnt_word++;
+                    break;
+
+                case '|':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    if (ptr_forward == buffer.end())
+                        output_line("bit-op");
+                    else
+                    {
+                        if (*ptr_forward == '=')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("asgn-op");
+                        }
+                        else if (*ptr_forward == '|')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("logic-op");
+                        }
+                        else
+                            output_line("bit-op");
+                    }
+
+                    cnt_word++;
+                    break;
+
+                case '^':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    if (ptr_forward == buffer.end())
+                        output_line("bit-op");
+                    else
+                    {
+                        if (*ptr_forward == '=')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("asgn-op");
+                        }
+                        else
+                            output_line("bit-op");
+                    }
+
+                    cnt_word++;
+                    break;
+
+                case '~':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+                    output_line("bit-op");
+                    cnt_word++;
+                    break;
+
+                case '<':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    if (ptr_forward == buffer.end())
+                        output_line("relop-op");
+                    else
+                    {
+                        if (*ptr_forward == '=')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("relop-op");
+                        }
+                        else
+                            output_line("relop-op");
+                    }
+
+                    cnt_word++;
+                    break;
+
+                case '=':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    if (ptr_forward == buffer.end())
+                        output_line("asgn-op");
+                    else
+                    {
+                        if (*ptr_forward == '=')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("relop-op");
+                        }
+                        else
+                            output_line("asgn-op");
+                    }
+
+                    ++cnt_word;
+                    break;
+
+                case '>':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    if (ptr_forward == buffer.end())
+                        output_line("relop-op");
+                    else
+                    {
+                        if (*ptr_forward == '=')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("relop-op");
+                        }
+                        else
+                            output_line("relop-op");
+                    }
+
+                    cnt_word++;
+                    break;
+
+                case '!':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    if (ptr_forward == buffer.end())
+                        output_line("punct");
+                    else
+                    {
+                        if (*ptr_forward == '=')
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("relop-op");
+                        }
+                        else
+                            output_line("punct");
+                    }
+
+                    cnt_word++;
+                    break;
+
+                case '\"':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    while (true)
+                    {
+                        while ((ptr_forward != buffer.end()) && (*ptr_forward != '\"'))
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                        }
+
+                        if (ptr_forward == buffer.end())
+                        {
+                            out_file_stream << "< Error(" << line << "," << column << "): Missing terminating \" character >" << endl;
+                            break;
+                        }
+                        else if (*(ptr_forward - 1) == '\\')
+                        {
+                            // 跳过转义符\"
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            continue;
+                        }
+                        else
+                        {
+                            token.append(1, *ptr_forward++);
+                            column++;
+                            output_line("string");
+                            break;
+                        }
+                    }
+
+                    cnt_word++;
+                    break;
+
+                case '\'':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    while ((ptr_forward != buffer.end()) && (*ptr_forward != '\''))
+                    {
+                        token.append(1, *ptr_forward++);
+                        column++;
+                    }
+
+                    if (ptr_forward == buffer.end())
+                        out_file_stream << "< Error(" << line << "," << column << "): Missing terminating \' character >" << endl;
+                    else if ((*(ptr_forward - 2) == '\\' && token.size() == 3) || (*(ptr_forward - 2) != '\\' && token.size() == 2))
+                    {
+                        // char类型只能是一个字符，或是两个字符的转义符
+                        token.append(1, *ptr_forward++);
+                        column++;
+                        output_line("char");
+                        cnt_word++;
+                    }
+                    else
+                    {
+                        ptr_forward++;
+                        column++;
+                        out_file_stream << "< Error(" << line << "," << column << "): Invalid char value >" << endl;
+                    }
+
+                    break;
+
+                case '.':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+
+                    if ((ptr_forward != buffer.end()) && isdigit(*ptr_forward))
+                    {
+                        // 小数点
+                        token.append(1, *ptr_forward++);
+                        column++;
+                        if (!test_digits(2)) // 读取无符号实数剩余部分
+                        {
+                            output_line("num");
+                            cnt_word++;
+                        }
+                        else
+                            out_file_stream << "< Error(" << line << "," << column << "): ID cannot start with digits >" << endl;
+                        break;
+                    }
+
+                    output_line("punct");
+                    cnt_word++;
+                    break;
+
+                case '#':
+                case '{':
+                case '}':
+                case '[':
+                case ']':
+                case '(':
+                case ')':
+                case '?':
+                case ':':
+                case ',':
+                case ';':
+                case '\\':
+                    token.append(1, C);
+                    ptr_forward++;
+                    column++;
+                    output_line("punct");
+                    cnt_word++;
+                    break;
+
+                default:
+                    ptr_forward++;
+                    column++;
+                    out_file_stream << "< Error(" << line << "," << column << "): Invalid character >" << endl;
+                    break;
+                } // end of switch
+            }     // end of else
+        }         // end of if
+    }             // end of while
+
+    return 0;
+}
+
+```
+
+### LEX
+
+```c
+%{
+#include <stdio.h>
+#include <string.h>
+
+int wordCount = 0;
+int charCount = 0;
+int columnCount = 0;
+int lineCount = 1;
+int IDCount = 0;
+int stringCount = 0;
+FILE *fp;
+
+
+%}
+
+delim     	 ([' ']|[\t])+
+ANY			 [.]
+WARP      	 [\n]
+NOTWARP   	 [^\n]
+letter    	 [A-Za-z]
+digit     	 [0-9]
+NOTSTR		 [^\"]
+NOTCHAR      [^\']
+ESC			 [\\]
+NOTESC		 [^\\]
+KEYWORD		 include|define|char|short|int|unsigned|long|float|double|struct|union|void|enum|signed|const|volatile|typedef|auto|register|static|extern|break|case|continue|default|do|else|for|goto|if|return|switch|while|sizeof
+STR     	 \"{NOTWARP}*\"
+CHAR         ({delim}?\'{NOTESC}?\')|({delim}?\'{ESC}{letter}?\')
+PUNC		 \,|\;
+DOT			 \.
+RELOP        \=\=|\<|\>|\<\=|\>\=
+EQUAL		 \=
+OPERATOR     \+|\-|\*|\\|\&|\||\^|\?|\%|\+\+|\-\-|\+\=|\-\=|\*\=|\/\=
+BRACKET      \(|\)|\{|\}|\[|\]
+ID        	 ({letter}|\_)({letter}|{digit}|\_)*
+NUM       	 {digit}+(\.{digit}+)?(E(\+|\-)?digit+)?
+MACRO		 \#
+INCLUDELIB	 \<({letter}|{digit}|{DOT})*\>
+LINECOMMENT  \/\/{NOTWARP}*
+error1   	 {digit}+{letter}+({letter}|{digit})*
+error2       (\"{NOTSTR}*)
+error3       @|~|`
+error4		 (({delim}?\'{NOTESC}{NOTCHAR}))|(({delim}?\'{ESC}{NOTCHAR}{NOTCHAR}))
+%x        	 IN_COMMENT
+
+%%
+{delim}        {
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	}
+{KEYWORD}      {
+	fprintf(fp,"KEYWORD(%d, %d): %s\n",lineCount,columnCount,yytext);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	wordCount++;
+	}
+{ID}           {
+	fprintf(fp,"ID%d(%d, %d): %s\n",IDCount,lineCount,columnCount,yytext);
+	IDCount++;
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	wordCount++;
+	}
+{NUM}          {
+	fprintf(fp,"NUM(%d, %d): %s\n",lineCount,columnCount,yytext);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	}
+{LINECOMMENT}  {
+	fprintf(fp,"LINENOTE(%d, %d): %s\n",lineCount,columnCount,yytext);
+	}
+{STR}          {
+	fprintf(fp,"STRING%d(%d, %d): %s\n",stringCount,lineCount,columnCount,yytext);
+	stringCount++;
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	}
+{CHAR}         {
+	fprintf(fp,"CHAR(%d, %d): %s\n",lineCount,columnCount,yytext);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	}
+{PUNC}	       {
+	fprintf(fp,"PUNCTUATION(%d, %d): %s\n",lineCount,columnCount,yytext);
+	columnCount++;
+	charCount++;
+	}
+{DOT}		   {
+	fprintf(fp,"DOT(%d, %d): %s\n",lineCount,columnCount,yytext);
+	columnCount++;
+	charCount++;
+	}
+{MACRO}		   {
+	fprintf(fp,"MACRO(%d, %d): %s\n",lineCount,columnCount,yytext);
+	columnCount++;
+	charCount++;
+	}
+{OPERATOR}     {
+	fprintf(fp,"OPERATOR(%d, %d): %s\n",lineCount,columnCount,yytext);
+	columnCount++;
+	charCount++;
+	}
+{RELOP}        {
+	fprintf(fp,"RELOP(%d, %d): %s\n",lineCount,columnCount,yytext);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	}
+{EQUAL}		   {
+	fprintf(fp,"EQUAL(%d, %d): %s\n",lineCount,columnCount,yytext);
+	columnCount++;
+	charCount++;
+	}
+{BRACKET}      {
+	fprintf(fp,"BRACKET(%d, %d): %s\n",lineCount,columnCount,yytext);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	}
+{INCLUDELIB}   {
+	fprintf(fp,"INCLUDE(%d, %d): %s\n",lineCount,columnCount,yytext);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	}
+{error1}       {
+	fprintf(fp,"ERROR: Line %d, Column %d: Identity cannot start with number \"%s\"\n",lineCount,columnCount+1,yytext);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	}
+{error2}       {
+	fprintf(fp,"ERROR:Line %d, Column %d: String cannot match the left puncuation \n",lineCount,columnCount+1);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	}
+{error3}       {
+	fprintf(fp,"ERROR: Line %d, Column %d: Invalid symbol \"%s\"\n",lineCount,columnCount+1,yytext);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+	}
+{error4}	   {
+	fprintf(fp,"ERROR: Line %d, Column %d: Invalid char pattern \"%s\"\n",lineCount,columnCount+1,yytext);
+	columnCount+=yyleng;
+	charCount+=yyleng;
+}
+
+<INITIAL>{
+"/*"           BEGIN(IN_COMMENT);yymore();
+}
+<IN_COMMENT>{
+"*/"           fprintf(fp,"ANNODATE(%d, %d): %s\n",lineCount,columnCount,yytext);BEGIN(INITIAL);
+[^*\n]+	       yymore();
+"*"            yymore();
+\n             lineCount++;yymore();
+}
+
+
+{WARP}         {
+	lineCount++;
+	columnCount=0;
+	}
+.              {
+	fprintf(fp,"UNKNOW(%d, %d): %s\n",lineCount,columnCount,yytext);
+	charCount++;
+	columnCount++;
+	}
+
+%%
+
+int main()
+{
+	fp = fopen("result.txt", "w");
+	yylex();
+	printf("\nFinished.\nResult:\n");
+	printf("Chars: %d \n",charCount);
+	printf("Lines: %d \n",lineCount);
+	printf("Words: %d \n",wordCount);
+	fclose(fp);
+	return 0;
+}
+
+int yyWARP()
+{
+	return 1;
 }
 ```
