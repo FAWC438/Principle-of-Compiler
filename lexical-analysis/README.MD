@@ -94,6 +94,7 @@ _词法分析器_：flex on Linux
     |   ├── lex.yy.c
     |   ├── result.txt
     |   └── test1.c
+    ├── README.md
     └── README.pdf
 
 文件树如上所示，其中`CPP`文件夹存放 C++ 版本的词法分析程序，`LEX`文件夹存放 LEX 版本的词法分析程序。
