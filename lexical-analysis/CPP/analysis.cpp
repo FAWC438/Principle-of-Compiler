@@ -18,7 +18,7 @@ ofstream out_file_stream;
 string in_file_str, out_file_str, buffer, token;
 string::iterator ptr_forward = buffer.end(); // 向前指针
 string words[] = {"include", "define", "auto", "double", "int", "struct", "break", "else", "long", "switch", "case", "enum", "register", "typedef", "char", "extern", "return", "union", "const", "float", "short", "unsigned", "continue", "for", "signed", "void", "default", "goto", "sizeof", "volatile", "do", "if", "static", "while"};
-vector<string> table; // 符号表
+vector<string> table;
 map<string, int> counter_map;
 
 /**
@@ -361,7 +361,7 @@ int main()
                 ptr_forward = buffer.begin();
                 column = 1;
             }
-            else // 读到错误或EOF则返回false
+            else // 读到EOF则输出结果
             {
                 show_result();
                 return 0;
@@ -370,7 +370,7 @@ int main()
 
         while ((ptr_forward != buffer.end()) && isspace(*ptr_forward))
         {
-            // 未读到缓冲区结束，则一直读到非空字符
+            // 跳过空字符
             ptr_forward++;
             column++;
         }

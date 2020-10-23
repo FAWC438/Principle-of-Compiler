@@ -18,6 +18,7 @@
 >
 > - [文件说明](#文件说明)
 > - [运行说明](#运行说明)
+> - [程序简介](#程序简介)
 > - [数据结构](#数据结构)
 > - [函数结构](#函数结构)
 >
@@ -59,6 +60,7 @@
   - 采用 C/C++ 作为实现语言，手工编写词法分析程序。
 
 - 方法二：
+
   - 编写 LEX 源程序，利用 LEX 编译程序自动生成词法分析程序。
 
 ---
@@ -71,7 +73,7 @@ _操作系统_：Windows 10 (version: 2004)
 
 _运行环境_：Windows Subsystem of Linux (Ubuntu-20.04 LTS)
 
-_编译器_：GCC-9 on Linux
+_编译器_：GCC-9 / G++-5 on Linux
 
 _词法分析器_：flex on Linux
 
@@ -86,8 +88,7 @@ _词法分析器_：flex on Linux
     |   ├── analysis
     |   ├── analysis.cpp
     |   ├── in.c
-    |   ├── out.txt
-    |   └── table.txt
+    |   └── out.txt
     ├── LEX
     |   ├── a.out
     |   ├── lex_source.l
@@ -96,11 +97,11 @@ _词法分析器_：flex on Linux
     |   └── test1.c
     └── README.pdf
 
-文件树如上所示，其中`CPP`文件夹存放C++版本的词法分析程序，。
+文件树如上所示，其中`CPP`文件夹存放 C++ 版本的词法分析程序，`LEX`文件夹存放 LEX 版本的词法分析程序。
 
-`thread.c`为本作业源代码，`thread`为可执行文件。
+`CPP`文件夹中，`analysis.cpp`为源代码，`analysis`为可执行文件，`in.c`是默认的待分析文本，`out.txt`是程序输出结果。
 
-在作业要求外，额外加入了非阻塞版本的代码`thread_no_block.c`及其可执行文件`thread_no_block`，以作为对照样例说明程序运行结果
+`LEX`文件夹中，`lex_source.l`为源代码，`lex.yy.c`为 flex 编译 LEX 文件后生成的中间 C 代码，`a.out`是可执行文件，`test1.c`是默认的待分析文本，`result.txt`是程序输出结果。
 
 `README.md`为本说明文档，`README.pdf`是本文档的 pdf 版本，以便于在没有 Markdown 浏览条件时阅读本文档。
 
@@ -108,20 +109,111 @@ _词法分析器_：flex on Linux
 
 ### 运行说明
 
+#### C++
+
 欲编译本程序并生成可执行文件，请在**源程序所在目录**的 Linux bash 中输入如下指令：
 
-    gcc thread.c -o thread -lpthread
+    g++ analysis.cpp -o analysis
 
-即可生成可执行文件`thread`。
-
-> **温馨提示**
-> 由于本程序调用 pthread 线程库，因此必须添加参数`-lpthread` 以实现库的动态链接
+即可生成可执行文件`analysis`。
 
 随后，直接使用以下指令即可运行可执行文件：
 
-    ./thread
+    ./analysis
 
-非阻塞版本程序的运行方式同上。
+#### LEX
+
+欲编译本程序并生成可执行文件，请在**源程序所在目录**的 Linux bash 中依次输入如下指令：
+
+    flex lex_source.l
+    gcc lex.yy.c -ll
+    ./a.out < test1.cpp
+
+即可生成结果`result.txt`。
+
+> **温馨提示**
+>
+> 1. 最后一行编译指令中，文件重定向可以更改，以选择`test1.cpp`以外的待分析文本。
+> 2. 第二行指令中不要忘记链接 flex 库（-ll）。
+
+### 程序简介
+
+C++版本的程序源文件内容**每次一行**地读入缓冲 buffer 中，向前指针则在每次 buffer 更新后从 buffer 的头部开始扫描，根据扫描得到不同的字符调用相应的分析代码。缓冲 buffer 的设置保证了读入字符的正确性，同时，本程序还支持判断单行和多行注释，并跳过其内容；也支持错误检测和错误处理，支持检测的错误如下：
+
+1. _Exponent has no digits_：指数部分没有数字，如`2.3e`、`4e+`等
+
+2. _ID cannot start with digits_：记号不能以数字开头，如`123abc`、`666_bcd`等
+
+3. _Missing terminating \" character_：字符串未匹配到末尾的冒号
+
+4. _Missing terminating \' character_：字符未匹配到末尾的冒号
+
+5. _Invalid char value_：非法的字符，正确的字符格式为`'a'`、`'\n'`等，非法的字符格式为`'a1'`、`'b\t'`等
+
+### 数据结构
+
+> 本部分仅讨论 C++ 版本程序
+
+#### 计数变量
+
+```cpp
+int line = 0, column = 0, cnt_word = 0, cnt_char = 0;
+```
+
+计数变量用于记录当前指针所分析的字符在源文件中的行数和列数，也记录了源文件中的单词数量和字符数量。**请注意，被分析程序判断为非法/错误的单词将不参与计数**。
+
+#### IO 流
+
+```cpp
+ifstream in_file_stream;
+ofstream out_file_stream;
+```
+
+本程序利用 C++特有的 IO 流处理文件输入和输出。
+
+#### 缓冲区
+
+```cpp
+string buffer, token;
+```
+
+利用 C++ 的`string`对象作为缓冲区的数据结构。
+
+`buffer`是数据缓冲区，在程序中，`buffer`存储了当前扫描行数的一整行内容。它的主要功能是超前扫描若干个字符，其目的是为了得到某一个单词符号的确切性质。
+
+`token`是已经扫描成功的字符，当一个单词被认为扫描完毕，此时就应该输出`token`，因为它存储了一个单词的全部字符。
+
+#### 向前指针
+
+```cpp
+string::iterator ptr_forward = buffer.end();
+```
+
+`ptr_forward`是向前指针，指示了当前即将分析的字符。它的数据类型是`string::iterator`，用以适应`buffer`的数据类型`string`。
+
+#### 关键字集合
+
+```cpp
+string words[] = {"include", "define", "auto", "double", "int", "struct", "break", "else", "long", "switch", "case", "enum", "register", "typedef", "char", "extern", "return", "union", "const", "float", "short", "unsigned", "continue", "for", "signed", "void", "default", "goto", "sizeof", "volatile", "do", "if", "static", "while"};
+set<string> keywords(words, words + 34);
+```
+
+利用 C++ 数据结构`set`，定义关键字集合。这样定义的原因在于，当分析器扫描到一个记号时，可以直接使用`set`的内置函数判断其是否为 C 语言关键字。
+
+#### 分析容器
+
+```cpp
+vector<string> table;
+map<string, int> counter_map;
+```
+
+`table`是一个`vector`容器，其记录了每一个记号 ( ID ) 的出现次数，这个容器的设计目的在于，当文本中多次出现同样模式的记号时，将会将它们归结为同一个记号而非多个记号。
+
+`counter_map`是一个`map`容器，用于统计各类单词的个数。
+
+### 函数结构
+
+> 本部分仅讨论 C++ 版本程序
 
 ---
 
