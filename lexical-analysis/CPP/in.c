@@ -91,5 +91,6 @@ bool Delete(List L, Position P)
 int main()
 {
     char a = 'a1', b = '\n';
+    int 123abc;
     printf("%c\n", '\n');
 }

@@ -16,8 +16,8 @@
 
 请注意：以下的Column对于多个字符的记号来说，指向的是其最后一个字符所在的列数
 
+----------------Result-------------------
   Line:Column    Type      Token        
------------------------------------------
 <    1:2         punct     #            >
 <    1:9         keyword   include      >
 <    1:11        relop-op  <            >
@@ -400,15 +400,63 @@
 <   93:23        asgn-op   =            >
 <   93:28        char      '\n'         >
 <   93:29        punct     ;            >
-<   94:11        ID-25     printf       >
-<   94:12        punct     (            >
-<   94:18        string    -            >
-<   94:19        punct     ,            >
-<   94:24        char      '\n'         >
-<   94:25        punct     )            >
-<   94:26        punct     ;            >
-<   95:2         punct     }            >
-
-Total lines: 95
-Total words: 370
-Total characters: 2304
+<   94:8         keyword   int          >
+< Error(94,12): ID cannot start with digits >
+<   94:15        ID-30     abc          >
+<   94:16        punct     ;            >
+<   95:11        ID-25     printf       >
+<   95:12        punct     (            >
+<   95:18        string    -            >
+<   95:19        punct     ,            >
+<   95:24        char      '\n'         >
+<   95:25        punct     )            >
+<   95:26        punct     ;            >
+<   96:2         punct     }            >
+---------------ID table------------------
+1    	math
+2    	h
+3    	stdio
+4    	stdlib
+5    	string
+6    	bool
+7    	false
+8    	true
+9    	MAXSIZE
+10   	ElementType
+11   	Position
+12   	LNode
+13   	List
+14   	Data
+15   	Last
+16   	MakeEmpty
+17   	L
+18   	malloc
+19   	ERROR
+20   	Find
+21   	X
+22   	i
+23   	Insert
+24   	P
+25   	printf
+26   	Delete
+27   	main
+28   	a
+29   	b
+30   	abc
+---------------Analysis------------------
+1    	ID        	130
+2    	arith-op  	13
+3    	asgn-op   	10
+4    	char      	2
+5    	comments  	19
+6    	keyword   	38
+7    	logic-op  	3
+8    	num       	13
+9    	ptr-op    	16
+10   	punct     	126
+11   	relop-op  	18
+12   	string    	4
+------------------Total------------------
+Total lines: 96
+Total words: 373
+Total characters: 2320

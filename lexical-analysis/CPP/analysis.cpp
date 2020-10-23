@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
@@ -11,13 +12,14 @@ using namespace std;
 
 int line = 0, column = 0, cnt_word = 0, cnt_char = 0;
 
+ifstream in_file_stream;
+ofstream out_file_stream;
+
 string in_file_str, out_file_str, buffer, token;
 string::iterator ptr_forward = buffer.end(); // 向前指针
-ifstream in_file_stream;
-ofstream out_file_stream, table_file_stream;
-
 string words[] = {"include", "define", "auto", "double", "int", "struct", "break", "else", "long", "switch", "case", "enum", "register", "typedef", "char", "extern", "return", "union", "const", "float", "short", "unsigned", "continue", "for", "signed", "void", "default", "goto", "sizeof", "volatile", "do", "if", "static", "while"};
 vector<string> table; // 符号表
+map<string, int> counter_map;
 
 /**
  * @brief 向符号表中插入符号。这个符号可能已经存在，也可能是新符号。若为新符号，插入符号表末尾。
@@ -48,10 +50,10 @@ int table_insert()
  * 
  * @param state_param 状态参数，输入1则开始判断实数
  */
-void test_digits(int state_param)
+bool test_digits(int state_param)
 {
     int state = state_param;
-    bool not_end_boolen = true;
+    bool not_end_boolen = true, is_wrong_ID = false;
 
     while ((ptr_forward != buffer.end()) && not_end_boolen)
     {
@@ -117,7 +119,7 @@ void test_digits(int state_param)
             }
             else
             {
-                out_file_stream << "< Error(" << line << "," << column << "): exponent has no digits >" << endl; //error();
+                out_file_stream << "< Error(" << line << "," << column << "): Exponent has no digits >" << endl;
                 not_end_boolen = false;
             }
 
@@ -133,7 +135,7 @@ void test_digits(int state_param)
             }
             else
             {
-                out_file_stream << "< Error(" << line << "," << column << "): exponent has no digits >" << endl; //error();
+                out_file_stream << "< Error(" << line << "," << column << "): Exponent has no digits >" << endl;
                 not_end_boolen = false;
             }
 
@@ -154,10 +156,14 @@ void test_digits(int state_param)
 
         default:
             // 实际上代码不可能运行到此处
-            out_file_stream << "< Error(" << line << "," << column << "): function test_digits() Error! >" << endl;
+            out_file_stream << "< Error(" << line << "," << column << "): Function test_digits() Error! >" << endl;
             break;
         }
     }
+    if (!((*ptr_forward >= 'a' && *ptr_forward <= 'z') || (*ptr_forward >= 'A' && *ptr_forward <= 'Z') || *ptr_forward == '_'))
+        return true;
+    else
+        return false;
 }
 
 /**
@@ -217,6 +223,16 @@ bool test_comments()
  */
 void output_line(string type_str)
 {
+    string type_str_finder = type_str;
+    if (type_str_finder.substr(0, 2) == "ID")
+        type_str_finder = "ID";
+
+    map<string, int>::iterator iter = counter_map.find(type_str_finder);
+    if (iter != counter_map.end())
+        counter_map[type_str_finder]++;
+    else
+        counter_map[type_str_finder] = 1;
+
     if (type_str == "comments" || type_str == "string")
     {
         out_file_stream << "<"
@@ -237,7 +253,7 @@ void output_line(string type_str)
 }
 
 /**
- * @brief 在输出中展示说明文本
+ * @brief 在输出开头展示说明文本
  * 
  */
 void show_head_word()
@@ -260,12 +276,12 @@ void show_head_word()
                     << endl;
     out_file_stream << "请注意：以下的Column对于多个字符的记号来说，指向的是其最后一个字符所在的列数" << endl
                     << endl;
+    out_file_stream << "----------------Result-------------------" << endl;
     out_file_stream << right << setw(6) << "Line"
                     << ":"
                     << left << setw(10) << "Column"
                     << left << setw(10) << "Type"
                     << left << setw(13) << "Token" << endl;
-    out_file_stream << "-----------------------------------------" << endl;
 }
 
 /**
@@ -276,18 +292,24 @@ void show_result()
 {
     int i = 1;
 
-    for (vector<string>::iterator it = table.begin(); it != table.end(); it++)
-        table_file_stream << left << i++ << "\t" << *it << endl;
+    out_file_stream << "---------------ID table------------------" << endl;
 
-    cout << "总行数：" << line << endl;
-    cout << "单词数：" << cnt_word << endl;
-    cout << "字符数：" << cnt_char << endl;
-    out_file_stream << endl
-                    << "Total lines: " << line << endl;
+    for (vector<string>::iterator it = table.begin(); it != table.end(); it++)
+        out_file_stream << left << setw(5) << i++ << "\t" << *it << endl;
+
+    i = 1;
+
+    out_file_stream << "---------------Analysis------------------" << endl;
+
+    for (map<string, int>::iterator it = counter_map.begin(); it != counter_map.end(); it++)
+        out_file_stream << left << setw(5) << i++ << "\t" << left << setw(10) << it->first << "\t" << it->second << endl;
+
+    cout << "分析完成，请到目标文件" << out_file_str << "查看输出结果！" << endl;
+    out_file_stream << "------------------Total------------------" << endl;
+    out_file_stream << "Total lines: " << line << endl;
     out_file_stream << "Total words: " << cnt_word << endl;
     out_file_stream << "Total characters: " << cnt_char << endl;
 
-    table_file_stream.close();
     in_file_stream.close();
     out_file_stream.close();
 }
@@ -321,14 +343,6 @@ int main()
     if (!out_file_stream)
     {
         cout << "无法创建目标文件！" << endl;
-        return -1;
-    }
-
-    table_file_stream.open("table.txt");
-
-    if (!table_file_stream)
-    {
-        cout << "无法创建符号表！" << endl;
         return -1;
     }
 
@@ -392,9 +406,13 @@ int main()
                 token.append(1, C);
                 ptr_forward++;
                 column++;
-                test_digits(1); // 读取无符号实数剩余部分
-                output_line("num");
-                cnt_word++;
+                if (test_digits(1)) // 读取无符号实数剩余部分
+                {
+                    output_line("num");
+                    cnt_word++;
+                }
+                else
+                    out_file_stream << "< Error(" << line << "," << column << "): ID cannot start with digits >" << endl;
             }
             else
             {
@@ -753,7 +771,7 @@ int main()
 
                         if (ptr_forward == buffer.end())
                         {
-                            out_file_stream << "< Error(" << line << "," << column << "): Missing terminating \" character >" << endl; //error();
+                            out_file_stream << "< Error(" << line << "," << column << "): Missing terminating \" character >" << endl;
                             break;
                         }
                         else if (*(ptr_forward - 1) == '\\')
@@ -815,9 +833,13 @@ int main()
                         // 小数点
                         token.append(1, *ptr_forward++);
                         column++;
-                        test_digits(2);
-                        output_line("num");
-                        cnt_word++;
+                        if (test_digits(2)) // 读取无符号实数剩余部分
+                        {
+                            output_line("num");
+                            cnt_word++;
+                        }
+                        else
+                            out_file_stream << "< Error(" << line << "," << column << "): ID cannot start with digits >" << endl;
                         break;
                     }
 
@@ -847,7 +869,7 @@ int main()
                 default:
                     ptr_forward++;
                     column++;
-                    out_file_stream << "< Error(" << line << "," << column << "): Invalid character >" << endl; //error();
+                    out_file_stream << "< Error(" << line << "," << column << "): Invalid character >" << endl;
                     break;
                 } // end of switch
             }     // end of else
