@@ -108,7 +108,11 @@ bool test_digits(int state_param)
                 state = 1;
             }
             else
+            {
+                out_file_stream << "< Error(" << line << "," << column << "): Invalid number pattern (no numbers after dot) >" << endl;
+                is_error = true;
                 not_end_boolen = false;
+            }
 
             break;
 
