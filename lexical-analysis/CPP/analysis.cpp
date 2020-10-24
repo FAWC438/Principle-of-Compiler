@@ -338,12 +338,14 @@ int main()
     if (in_file_str == "")
         in_file_str = "in.c";
 
-    in_file_stream.open(in_file_str.c_str());
-
-    if (!in_file_stream)
+    try
     {
+        in_file_stream.open(in_file_str.c_str());
+    }
+    catch (const exception &e)
+    {
+        cerr << e.what() << '\n';
         cout << "无法打开源文件！" << endl;
-        return -1;
     }
 
     cout << "请输入目标文件名称（回车则默认使用out.txt）：" << endl;
@@ -352,12 +354,14 @@ int main()
     if (out_file_str == "")
         out_file_str = "out.txt";
 
-    out_file_stream.open(out_file_str.c_str());
-
-    if (!out_file_stream)
+    try
     {
+        out_file_stream.open(out_file_str.c_str());
+    }
+    catch (const exception &e)
+    {
+        cerr << e.what() << '\n';
         cout << "无法创建目标文件！" << endl;
-        return -1;
     }
 
     show_head_word();
@@ -825,6 +829,15 @@ int main()
                         // char类型只能是一个字符，或是两个字符的转义符
                         token.append(1, *ptr_forward++);
                         column++;
+                        output_line("char");
+                        cnt_word++;
+                    }
+                    else if (*(ptr_forward - 1) == '\\' && token.size() == 2 && *(ptr_forward + 1) == '\'')
+                    {
+                        // '\''的情况
+                        token.append(1, *ptr_forward++);
+                        token.append(1, *ptr_forward++);
+                        column += 2;
                         output_line("char");
                         cnt_word++;
                     }

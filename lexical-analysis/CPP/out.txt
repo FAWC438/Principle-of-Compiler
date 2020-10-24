@@ -406,26 +406,23 @@
 <   94:22        asgn-op   =            >
 < Error(94,32): Invalid char value >
 <   94:33        ID-29     a            >
-< Error(94,42): Invalid char value >
-<   94:43        punct     \            >
-<   94:44        ID-31     n            >
-< Error(94,46): Missing terminating ' character >
+< Error(94,35): Missing terminating ' character >
 <   95:8         keyword   int          >
 < Error(95,12): ID cannot start with digits >
-<   95:15        ID-32     abc          >
+<   95:15        ID-31     abc          >
 <   95:16        punct     ;            >
 <   96:8         keyword   int          >
-<   96:10        ID-33     c            >
+<   96:10        ID-32     c            >
 <   96:12        asgn-op   =            >
 <   96:17        num       1e+3         >
 <   96:18        punct     ;            >
 <   97:8         keyword   int          >
-<   97:10        ID-34     d            >
+<   97:10        ID-33     d            >
 <   97:12        asgn-op   =            >
 < Error(97,15): Exponent has no digits >
 < Error(97,15): ID cannot start with digits >
 <   97:16        punct     ,            >
-<   97:18        ID-35     e            >
+<   97:18        ID-34     e            >
 <   97:20        asgn-op   =            >
 < Error(97,23): Invalid number pattern (double dots) >
 < Error(97,23): ID cannot start with digits >
@@ -442,7 +439,7 @@
 <   98:26        punct     ;            >
 <   99:9         keyword   char         >
 <   99:11        arith-op  *            >
-<   99:14        ID-36     str          >
+<   99:14        ID-35     str          >
 <   99:16        asgn-op   =            >
 < Error(99,26): Missing terminating " character >
 <  100:2         punct     }            >
@@ -477,14 +474,13 @@
 28   	s
 29   	a
 30   	a1
-31   	n
-32   	abc
-33   	c
-34   	d
-35   	e
-36   	str
+31   	abc
+32   	c
+33   	d
+34   	e
+35   	str
 ---------------Analysis------------------
-1    	ID        	137
+1    	ID        	136
 2    	arith-op  	15
 3    	asgn-op   	15
 4    	char      	2
@@ -493,10 +489,10 @@
 7    	logic-op  	3
 8    	num       	15
 9    	ptr-op    	16
-10   	punct     	130
+10   	punct     	129
 11   	relop-op  	18
 12   	string    	5
 ------------------Total------------------
 Total lines: 100
-Total words: 399
-Total characters: 2431
+Total words: 397
+Total characters: 2420
