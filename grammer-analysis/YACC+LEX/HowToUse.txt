@@ -1,0 +1,4 @@
+bison -d yacc.y
+flex lex.l
+cc -o exe yacc.tab.c lex.yy.c
+./exe < test.txt
