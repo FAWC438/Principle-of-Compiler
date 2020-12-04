@@ -1,5 +1,5 @@
 %{
-	int calc_num();
+	int getNum();
 	#include "yacc.tab.h"
 %}
 
@@ -9,7 +9,7 @@ num	{digit}+
 %%
 
 {num} {
-	yylval=calc_num();
+	yylval = getNum();
 	return(num);
 }
 
@@ -25,9 +25,9 @@ int yywrap() {
 	return 1;
 }
 
-int calc_num() {
-	int sum = 0, i;
-	for(i = 0; yytext[i] != '\0' ;i++)
+int getNum() {
+	int sum = 0;
+	for(int i = 0; yytext[i] != '\0' ;i++)
 			sum = sum * 10 + (yytext[i] - '0');
 	return sum;
 }

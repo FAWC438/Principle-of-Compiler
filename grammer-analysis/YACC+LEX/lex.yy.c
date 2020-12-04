@@ -445,7 +445,7 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "lex.l"
 #line 2 "lex.l"
-	int calc_num();
+	int getNum();
 	#include "yacc.tab.h"
 #line 451 "lex.yy.c"
 #line 452 "lex.yy.c"
@@ -729,7 +729,7 @@ case 1:
 YY_RULE_SETUP
 #line 11 "lex.l"
 {
-	yylval=calc_num();
+	yylval = getNum();
 	return(num);
 }
 	YY_BREAK
@@ -1785,9 +1785,9 @@ int yywrap() {
 	return 1;
 }
 
-int calc_num() {
-	int sum = 0, i;
-	for(i = 0; yytext[i] != '\0' ;i++)
+int getNum() {
+	int sum = 0;
+	for(int i = 0; yytext[i] != '\0' ;i++)
 			sum = sum * 10 + (yytext[i] - '0');
 	return sum;
 }
