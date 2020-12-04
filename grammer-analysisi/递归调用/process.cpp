@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -112,6 +113,8 @@ int procF()
 int main(int argc, char const *argv[])
 {
     inputFile >> buffer;
+    // 删除字符串的空格
+    buffer.erase(remove_if(buffer.begin(), buffer.end(), [](unsigned char x) { return isspace(x); }), buffer.end());
     cout << "Buffer: " << buffer << endl;
     int result = procE();
     cout << "Answer: " << result << endl;
